@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 
-from try_gan.tests.test_example import TestExample
+from hmcollab.tests.test_example import TestExample
 
 
 class CountSuite(object):
