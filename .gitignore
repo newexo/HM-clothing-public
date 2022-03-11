@@ -130,3 +130,7 @@ dmypy.json
 
 # ignore PyCharm generated files
 .idea/
+
+# ignore project specifc data and models
+data/*.csv
+data/images
