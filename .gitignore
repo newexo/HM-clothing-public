@@ -134,3 +134,6 @@ dmypy.json
 # ignore project specifc data and models
 data/*.csv
 data/images
+
+# ignore MacOS generated files
+.DS_Store
