@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import unittest
 
+from hmcollab.tests.test_datasets import TestDatasets
 from hmcollab.tests.test_directories import TestDirectories
 from hmcollab.tests.test_example import TestExample
 
@@ -19,6 +20,7 @@ class CountSuite(object):
 def suite():
     s = CountSuite()
 
+    s.add(TestDatasets)
     s.add(TestDirectories)
     s.add(TestExample)
 

@@ -13,17 +13,17 @@ def code(filename=None):
 
 
 def base(filename=None):
-    basepath = os.path.abspath(code('..'))  
+    basepath = os.path.abspath(code(".."))
     return qualifyname(basepath, filename)
 
 
 def tests(filename=None):
-    return qualifyname(os.path.join(code(), 'tests'), filename)
+    return qualifyname(os.path.join(code(), "tests"), filename)
 
 
 def data(filename=None):
-    return qualifyname(os.path.join(base(), 'data'), filename)
+    return qualifyname(os.path.join(base(), "data"), filename)
 
 
 def testdata(filename=None):
-    return qualifyname(os.path.join(tests(), 'testdata'), filename)
+    return qualifyname(os.path.join(tests(), "testdata"), filename)
