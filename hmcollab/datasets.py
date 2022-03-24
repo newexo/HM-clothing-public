@@ -41,6 +41,13 @@ class HMDataset:
         if tree is None:
             tree = HMDatasetDirectoryTree()
         self.tree = tree
-        self.articles = pd.read_csv(self.tree.articles)
+        self.articles = pd.read_csv(
+            self.tree.articles,
+            dtype={
+                "article_id": object,
+                "product_code": object,
+                "colour_group_code": object,
+            },
+        )
         self.customers = pd.read_csv(self.tree.customers)
         self.transactions = pd.read_csv(self.tree.transactions)

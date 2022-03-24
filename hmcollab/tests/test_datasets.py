@@ -67,6 +67,21 @@ class TestDatasets(unittest.TestCase):
         self.assertEqual(expected, actual)
         self.assertEqual(3, self.dataset.articles.shape[0])
 
+    def test_article_id(self):
+        expected = "0110065001"
+        actual = self.dataset.articles.iloc[0].article_id
+        self.assertEqual(expected, actual)
+
+    def test_product_code(self):
+        expected = "0110065"
+        actual = self.dataset.articles.iloc[0].product_code
+        self.assertEqual(expected, actual)
+
+    def test_colour_group_code(self):
+        expected = "09"
+        actual = self.dataset.articles.iloc[0].colour_group_code
+        self.assertEqual(expected, actual)
+
     def test_customers(self):
         expected = ['customer_id', 'FN', 'Active', 'club_member_status',
                     'fashion_news_frequency', 'age', 'postal_code']
