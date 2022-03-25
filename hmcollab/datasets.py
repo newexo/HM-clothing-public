@@ -50,4 +50,9 @@ class HMDataset:
             },
         )
         self.customers = pd.read_csv(self.tree.customers)
-        self.transactions = pd.read_csv(self.tree.transactions)
+        self.transactions = pd.read_csv(
+            self.tree.transactions,
+            dtype={
+                "article_id": object,
+            },
+        )

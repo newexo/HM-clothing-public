@@ -72,6 +72,11 @@ class TestDatasets(unittest.TestCase):
         actual = self.dataset.articles.iloc[0].article_id
         self.assertEqual(expected, actual)
 
+    def test_transaction_article_id(self):
+        expected = "0110065001"
+        actual = self.dataset.transactions.iloc[0].article_id
+        self.assertEqual(expected, actual)
+
     def test_product_code(self):
         expected = "0110065"
         actual = self.dataset.articles.iloc[0].product_code

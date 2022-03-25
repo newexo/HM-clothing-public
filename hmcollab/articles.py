@@ -10,10 +10,6 @@ class ArticleMunger(metaclass=ABCMeta):
         self.x = self._to_array()
 
     @abstractmethod
-    def features(self):
-        pass
-
-    @abstractmethod
     def _to_array(self):
         pass
 
