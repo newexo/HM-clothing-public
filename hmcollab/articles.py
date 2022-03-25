@@ -51,7 +51,7 @@ class ArticleFeaturesSimpleFeatures(ArticleFeatureMunger):
 
 
 class ArticleKNN:
-    def __init__(self, articles: ArticleMunger, k):
+    def __init__(self, articles: ArticleMunger, k=20):
         self.k = k
         self.a = articles
         self.model = NearestNeighbors(n_neighbors=k).fit(articles.x.values)
