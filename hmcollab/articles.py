@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 import pandas as pd
+from sklearn.neighbors import NearestNeighbors
 
 
 class ArticleMunger(metaclass=ABCMeta):
@@ -47,3 +48,23 @@ class ArticleFeaturesSimpleFeatures(ArticleFeatureMunger):
             "section_no",
             "garment_group_no",
         ]
+
+
+class ArticleKNN:
+    def __init__(self, articles: ArticleMunger, k):
+        self.k = k
+        self.a = articles
+        self.model = NearestNeighbors(n_neighbors=k).fit(articles.x.values)
+
+    def nearest(self, index=None, id=None, row=None):
+        if id is not None:
+            matches = self.a.df[self.a.df.article_id == id].index
+            index = matches[0]
+
+        if index is not None:
+            row = self.a.x.values[index]
+
+        row = row.reshape((1, -1))
+
+        return self.model.kneighbors(row)
+
