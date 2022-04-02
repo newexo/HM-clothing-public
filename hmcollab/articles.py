@@ -5,8 +5,9 @@ from sklearn.neighbors import NearestNeighbors
 
 
 class ArticleMunger(metaclass=ABCMeta):
-    def __init__(self, df: pd.DataFrame):
+    def __init__(self, df: pd.DataFrame, use_article_id=False):
         self.df = df
+        self.use_article_id = use_article_id
         self.x = self._to_array()
 
     @abstractmethod
@@ -25,6 +26,8 @@ class ArticleFeatureMunger(ArticleMunger, metaclass=ABCMeta):
 
     def _to_array(self):
         features = self.features()
+        if self.use_article_id:
+            return pd.get_dummies(self.df[['article_id'] + features], columns=features, prefix=features)
         return pd.get_dummies(self.df[features], columns=features, prefix=features)
 
 

@@ -2,10 +2,16 @@ import unittest
 
 import numpy as np
 from numpy.linalg import norm
+import pandas as pd
 
 from hmcollab import articles
 from hmcollab import datasets
 from hmcollab import directories
+
+# just for testing
+def dummy_features(df, columns):
+    # for articles
+    return pd.get_dummies(df[['article_id'] + columns], columns=columns, prefix=columns)
 
 
 class TestArticles(unittest.TestCase):
@@ -25,7 +31,7 @@ class TestArticles(unittest.TestCase):
 
     def test_article_simple_feature_array(self):
         a = self.get_simple()
-        expected = (16, 63)
+        expected = (17, 65)
         actual = a.x.shape
         self.assertEqual(expected, actual)
 
@@ -96,3 +102,29 @@ class TestArticles(unittest.TestCase):
         expected = {12, 10,  2,  1}
         actual = set(indices[0])
         self.assertEqual(expected, actual)
+
+    def test_use_article_ids(self):
+        features = [
+            "product_type_no",
+            "product_group_name",
+            "graphical_appearance_no",
+            "colour_group_code",
+            "perceived_colour_value_id",
+            "perceived_colour_master_id",
+            "department_no",
+            "index_code",
+            "index_group_no",
+            "section_no",
+            "garment_group_no",
+        ]
+        expected = dummy_features(self.dataset.articles, features)
+        munger = articles.ArticleFeaturesSimpleFeatures(self.dataset.articles, use_article_id=True)
+        actual = munger.x
+        # test that columns are same
+        self.assertEqual(list(expected.columns), list(actual.columns))
+
+        # test that dummy values are same
+        self.assertEqual(0, norm(expected.values[:, 1:] - actual.values[:, 1:]))
+
+        # test article ids are same
+        self.assertEqual(list(expected.article_id), list(actual.article_id))

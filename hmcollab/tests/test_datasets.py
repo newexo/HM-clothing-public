@@ -65,7 +65,7 @@ class TestDatasets(unittest.TestCase):
                     'garment_group_no', 'garment_group_name', 'detail_desc']
         actual = list(self.dataset.articles.columns)
         self.assertEqual(expected, actual)
-        self.assertEqual(16, self.dataset.articles.shape[0])
+        self.assertEqual(17, self.dataset.articles.shape[0])
 
     def test_article_id(self):
         expected = "0110065001"
@@ -98,4 +98,4 @@ class TestDatasets(unittest.TestCase):
         expected = ['t_dat', 'customer_id', 'article_id', 'price', 'sales_channel_id']
         actual = list(self.dataset.transactions.columns)
         self.assertEqual(expected, actual)
-        self.assertEqual(2, self.dataset.transactions.shape[0])
+        self.assertEqual(3, self.dataset.transactions.shape[0])
