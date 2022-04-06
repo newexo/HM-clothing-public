@@ -1,6 +1,7 @@
 import unittest
 
 from numpy.linalg import norm
+from sklearn.cluster import KMeans
 
 from hmcollab import datasets
 from hmcollab import directories
@@ -16,6 +17,7 @@ class TestTransactions(unittest.TestCase):
             self.dataset.articles, use_article_id=True
         )
         self.customer = "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0"
+        self.clusters = 2
 
     def tearDown(self):
         pass
@@ -47,3 +49,16 @@ class TestTransactions(unittest.TestCase):
 
         # test that dummy values are same
         self.assertEqual(0, norm(expected.values - actual.values))
+
+    def test_kmeans_consumer(self):
+        full_dummies = articles.ArticleFeaturesSimpleFeatures(self.dataset.articles,
+                                use_article_id=True).x
+        t = transactions.TransactionsByCustomer(self.dataset.transactions)
+        customer_dummies = t.customer_dummies(self.customer, full_dummies)
+        kmeans = KMeans(init="k-means++", n_clusters=self.clusters,
+                    n_init=10, max_iter=300, random_state=42
+                    ).fit(customer_dummies)
+        expected = kmeans.cluster_centers_
+        actual = transactions.kmeans_consumer(self.customer, self.dataset.transactions,
+                                               full_dummies, k=self.clusters).cluster_centers_
+        self.assertEqual(expected.tolist(), actual.tolist())
