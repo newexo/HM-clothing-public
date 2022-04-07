@@ -37,7 +37,7 @@ def recommender(customers, dataset, full_dummies):
     """
     df = pd.DataFrame(columns=['prediction'], index=customers)
     for c in customers:
-        recommendations = recommender_by_customer(c, dataset.transactions, full_dummies)
+        recommendations = recommender_by_customer(c, dataset, full_dummies)
         df.loc[c] = {'prediction': ' '.join(recommendations)}
     df = df.reset_index().rename(columns={'index':'customer_id'})
     return df
