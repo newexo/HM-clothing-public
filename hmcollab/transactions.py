@@ -1,5 +1,15 @@
+import datetime
 import pandas as pd
 from sklearn.cluster import KMeans
+
+
+def split_by_time(df, days):
+    """Split transactions dataframe by a cutoff number of days from
+    the last transaction at column t_dat"""
+    df['t_dat'] =  pd.to_datetime(df['t_dat'], format='%Y-%m-%d')
+    last = df['t_dat'].max()
+    cutoff_date = last - datetime.timedelta(days=days)
+    return df[df.t_dat >= cutoff_date], df[df.t_dat < cutoff_date]
 
 
 class TransactionsByCustomer:

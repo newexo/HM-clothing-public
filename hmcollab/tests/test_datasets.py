@@ -98,4 +98,4 @@ class TestDatasets(unittest.TestCase):
         expected = ['t_dat', 'customer_id', 'article_id', 'price', 'sales_channel_id']
         actual = list(self.dataset.transactions.columns)
         self.assertEqual(expected, actual)
-        self.assertEqual(3, self.dataset.transactions.shape[0])
+        self.assertEqual(6, self.dataset.transactions.shape[0])

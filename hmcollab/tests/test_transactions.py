@@ -31,9 +31,18 @@ class TestTransactions(unittest.TestCase):
         )
         self.customer = "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0"
         self.clusters = 2
+        self.days = 7
 
     def tearDown(self):
         pass
+
+    def test_split_by_time(self):
+        # so far we are testing the number of rows after the split
+        # TODO: expand
+        y, x = transactions.split_by_time(self.dataset.transactions, self.days)
+        self.assertEqual(3, y.shape[0])
+        self.assertEqual(3, x.shape[0])
+
 
     def test_all_article_ids(self):
         t = transactions.TransactionsByCustomer(self.dataset.transactions)
