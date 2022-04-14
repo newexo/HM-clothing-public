@@ -39,7 +39,8 @@ class TestTransactions(unittest.TestCase):
     def test_split_by_time(self):
         # so far we are testing the number of rows after the split
         # TODO: expand
-        y, x = transactions.split_by_time(self.dataset.transactions, self.days)
+        six_transactions = self.dataset.transactions.iloc[:6].copy()
+        y, x = transactions.split_by_time(six_transactions, self.days)
         self.assertEqual(3, y.shape[0])
         self.assertEqual(3, x.shape[0])
 

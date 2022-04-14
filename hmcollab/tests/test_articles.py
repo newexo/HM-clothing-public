@@ -24,7 +24,7 @@ class TestArticles(unittest.TestCase):
         pass
 
     def get_simple(self):
-        return articles.ArticleFeaturesSimpleFeatures(self.dataset.articles)
+        return articles.ArticleFeaturesSimpleFeatures(self.dataset.articles.iloc[:17])
 
     def get_simple_knn(self):
         return  articles.ArticleKNN(self.get_simple(), 4)
