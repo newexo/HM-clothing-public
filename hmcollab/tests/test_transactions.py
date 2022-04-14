@@ -2,12 +2,12 @@ import unittest
 
 from numpy.linalg import norm
 from sklearn.cluster import KMeans
+import pandas as pd
 
 from hmcollab import datasets
 from hmcollab import directories
 from hmcollab import articles
 from hmcollab import transactions
-
 
 
 def kmeans_consumer_old(customer, transactions_df, full_articles_dummy, k=1):
@@ -44,6 +44,71 @@ class TestTransactions(unittest.TestCase):
         self.assertEqual(3, y.shape[0])
         self.assertEqual(3, x.shape[0])
 
+    def test_slit_by_time_first_six(self):
+        six_transactions = self.dataset.transactions.iloc[:6].copy()
+        y, x = transactions.split_by_time(six_transactions, self.days)
+
+        # verify that returned dataframes have correct columns
+        expected = ["t_dat", "customer_id", "article_id", "price", "sales_channel_id"]
+        actual = list(y.columns)
+        self.assertEqual(expected, actual)
+
+        actual = list(x.columns)
+        self.assertEqual(expected, actual)
+
+        # verify timestamps
+        actual = list(y.t_dat)
+        expected = [pd.Timestamp(year=2020, month=8, day=19)] * 3
+        self.assertEqual(expected, actual)
+
+        actual = list(x.t_dat)
+        expected = [pd.Timestamp(year=2018, month=9, day=20)] * 3
+        self.assertEqual(expected, actual)
+
+        # verify customer ids
+        actual = list(y.customer_id)
+        expected = [
+            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
+            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
+            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
+        ]
+        self.assertEqual(expected, actual)
+
+        actual = list(x.customer_id)
+        # print(repr(actual))
+        expected = [
+            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
+            "18cfbd899a5f5f3b4bc0a0430104e0fd436c9fb10402eb184d95582a9f59d8b3",
+            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
+        ]
+        self.assertEqual(expected, actual)
+
+        # verify article ids
+        actual = list(y.article_id)
+        expected = ["0907534001", "0871517002", "0877274003"]
+        self.assertEqual(expected, actual)
+
+        actual = list(x.article_id)
+        expected = ["0110065001", "0111586001", "0531697003"]
+        self.assertEqual(expected, actual)
+
+        # verify price
+        actual = list(y.price)
+        expected = [0.0254067796610168, 0.0254067796610168, 0.0338813559322033]
+        self.assertEqual(expected, actual)
+
+        actual = list(x.price)
+        expected = [0.022864406779661, 0.0127796610169491, 0.022864406779661]
+        self.assertEqual(expected, actual)
+
+        # verify sales channel id
+        actual = list(y.sales_channel_id)
+        expected = [1, 1, 1]
+        self.assertEqual(expected, actual)
+
+        actual = list(x.sales_channel_id)
+        expected = [1, 2, 1]
+        self.assertEqual(expected, actual)
 
     def test_all_article_ids(self):
         t = transactions.TransactionsByCustomer(self.dataset.transactions)
@@ -51,7 +116,7 @@ class TestTransactions(unittest.TestCase):
             self.customer
         )
         actual = list(actual)
-        expected = ["0110065001", "0531697003"]
+        expected = ['0110065001', '0531697003', '0907534001', '0871517002', '0877274003']
         self.assertEqual(expected, actual)
 
     def test_customer_dummies(self):
