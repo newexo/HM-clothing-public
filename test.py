@@ -5,6 +5,7 @@ from hmcollab.tests.test_articles import TestArticles
 from hmcollab.tests.test_datasets import TestDatasets
 from hmcollab.tests.test_directories import TestDirectories
 from hmcollab.tests.test_example import TestExample
+from hmcollab.tests.test_scoring import TestScoring
 from hmcollab.tests.test_transactions import TestTransactions
 
 
@@ -26,6 +27,7 @@ def suite():
     s.add(TestDatasets)
     s.add(TestDirectories)
     s.add(TestExample)
+    s.add(TestScoring)
     s.add(TestTransactions)
 
     return s.s
