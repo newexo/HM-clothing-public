@@ -36,11 +36,20 @@ class KnnRecommender:
                 recomendation_ids.append(article_id)
         return recomendation_ids
 
+    def recommend_all(self, customer_list):
+        df = pd.DataFrame(columns=["prediction"], index=customer_list)
+        for c in customer_list:
+            recommendations = self.recommend(c)
+            df.loc[c] = {"prediction": " ".join(recommendations)}
+        df = df.reset_index().rename(columns={"index": "customer_id"})
+        return df
+
 
 def recommender_by_customer(
     customer, dataset, full_article_dummies, groups=6, total_recommendations=12
 ):
     """
+    This is the old version of KnnRecommender.recommend
     customer:
         The customer id
     groups:
