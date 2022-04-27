@@ -2,6 +2,7 @@ import os
 import pandas as pd
 
 from . import directories
+from hmcollab import transactions
 
 
 class HMDatasetDirectoryTree:
@@ -56,3 +57,4 @@ class HMDataset:
                 "article_id": object,
             },
         )
+        self.transactions_x, self.transactions_y = transactions.split_by_time(self.transactions, days=7)

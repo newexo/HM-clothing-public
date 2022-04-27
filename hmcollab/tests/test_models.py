@@ -69,7 +69,6 @@ class TestModels(unittest.TestCase):
             total_recommendations=4,
         )
         df = recommender.recommend_all(self.customer_list)
-        print(df.iloc[:,1])
 
         actual = df.shape
         expected = (2, 2)
@@ -82,7 +81,7 @@ class TestModels(unittest.TestCase):
         actual = df.prediction[0]
         expected = '0795440001 0796137001 0590928022 0599580049'
         self.assertEqual(expected, actual)
-        
+
         actual = df.prediction[1]
         expected = '0625548001 0627759010 0568601006 0797065001'
         self.assertEqual(expected, actual)
