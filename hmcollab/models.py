@@ -5,6 +5,33 @@ from hmcollab import articles
 from hmcollab import transactions
 
 
+class PopularRecommender:
+    def __init__(
+        self, dataset, full_article_dummies, total_recommendations=12
+    ):
+        self.dataset = dataset
+        self.full_article_dummies = full_article_dummies
+        self.total_recommendations = total_recommendations
+        self.transactions = self.dataset.transactions_x
+        self.simple_munger = articles.ArticleFeaturesSimpleFeatures(
+            self.dataset.articles
+        )
+
+    def recommend(self):
+        """Return a list of article_ids with the most transactions.
+        It will provide the same recommendation for all customers (old and new)"""
+        top_df = self.transactions.groupby(['article_id'], as_index=False).size()
+        top_df.sort_values(by=['size'], ascending=False, inplace=True)
+        return top_df.article_id[:self.total_recommendations].values.tolist()
+
+
+    def recommend_all(self, customer_list):
+        df = pd.DataFrame(columns=["prediction"], index=customer_list)
+        df['prediction'] = " ".join(self.recommend())
+        df = df.reset_index().rename(columns={"index": "customer_id"})
+        return df
+
+
 class KnnRecommender:
     def __init__(
         self, dataset, full_article_dummies, groups=6, total_recommendations=12

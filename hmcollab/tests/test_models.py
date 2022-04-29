@@ -66,3 +66,37 @@ class TestModels(unittest.TestCase):
         actual = df.prediction[1]
         expected = '0715624008 0783388001 0726925001 0735843004'
         self.assertEqual(expected, actual)
+
+
+    def test_popular_recommender(self):
+        recommender = models.PopularRecommender(
+            self.dataset,
+            self.full_dummies,
+            total_recommendations=12,
+        )
+
+        # 1. Test recommend
+        actual_recommend = recommender.recommend()
+        expected = ['0811835004', '0723529001', '0351484002', '0689898002', '0797065001',
+                    '0599580049', '0599580024', '0590928022', '0583558001', '0640174001',
+                    '0800436010', '0568601006']
+        self.assertEqual(expected, actual_recommend)
+
+        # 2. Test recommend_all
+        actual_recommend_all = recommender.recommend_all(self.customer_list)
+
+        # 2.1 Is the number of rows right?
+        actual_rows = actual_recommend_all.shape[0]
+        expected = len(self.customer_list)
+        self.assertEqual(expected, actual_rows)
+
+        # 2.2 Check that recommend_all is getting the same prediction for all customers
+        actual = actual_recommend_all.prediction.value_counts().shape[0]
+        expected = 1
+        self.assertEqual(expected, actual)
+
+        # 2.3 Is the recommendation right for all?
+        actual = actual_recommend_all.iloc[0, 1]
+        expected = " ".join(actual_recommend)
+        self.assertEqual(expected, actual)
+
