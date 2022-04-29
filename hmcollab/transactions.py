@@ -9,7 +9,9 @@ def split_by_time(df, days):
     df['t_dat'] =  pd.to_datetime(df['t_dat'], format='%Y-%m-%d')
     last = df['t_dat'].max()
     cutoff_date = last - datetime.timedelta(days=days)
-    return df[df.t_dat >= cutoff_date], df[df.t_dat < cutoff_date]
+    older = df[df.t_dat < cutoff_date]
+    newer = df[df.t_dat >= cutoff_date]
+    return older, newer
 
 
 class TransactionsByCustomer:
