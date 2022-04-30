@@ -46,7 +46,7 @@ class TestTransactions(unittest.TestCase):
 
     def test_slit_by_time_first_six(self):
         six_transactions = self.dataset.transactions.iloc[:6].copy()
-        y, x = transactions.split_by_time(six_transactions, self.days)
+        x, y = transactions.split_by_time(six_transactions, self.days)
 
         # verify that returned dataframes have correct columns
         expected = ["t_dat", "customer_id", "article_id", "price", "sales_channel_id"]
@@ -75,7 +75,6 @@ class TestTransactions(unittest.TestCase):
         self.assertEqual(expected, actual)
 
         actual = list(x.customer_id)
-        # print(repr(actual))
         expected = [
             "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
             "18cfbd899a5f5f3b4bc0a0430104e0fd436c9fb10402eb184d95582a9f59d8b3",

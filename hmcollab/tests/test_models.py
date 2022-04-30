@@ -8,13 +8,13 @@ from hmcollab import models
 
 class TestModels(unittest.TestCase):
     def setUp(self):
-        self.tree = datasets.HMDatasetDirectoryTree(base=directories.testdata())
+        self.tree = datasets.HMDatasetDirectoryTree(base=directories.testdata("ten_customers"))
         self.dataset = datasets.HMDataset(tree=self.tree)
         self.articles_munger = articles.ArticleFeaturesSimpleFeatures(
             self.dataset.articles, use_article_id=True
         )
         self.customer = (
-            "0000423b00ade91418cceaf3b26c6af3dd342b51fd051eec9c12fb36984420fa"
+            "0000757967448a6cb83efb3ea7a3fb9d418ac7adf2379d8cd0c725276a467a2a"
         )
         self.clusters = 2
         self.days = 7
@@ -22,33 +22,13 @@ class TestModels(unittest.TestCase):
             self.dataset.articles, use_article_id=True
         ).x
 
-        self.recommendations = [
-            "0795440001",
-            "0796137001",
-            "0673677002",
-            "0590928022",
-            "0599580049",
-            "0559616014",
-        ]
-
         self.customer_list = [
-            "0000423b00ade91418cceaf3b26c6af3dd342b51fd051eec9c12fb36984420fa",
-            "00000dbacae5abe5e23885899a1fa44253a17956c6d1c3d25f88aa139fdfc657",
+            "000058a12d5b43e67d225668fa1f8d618c13dc232df0cad8ffe7ad4a1091e318",
+            "0000757967448a6cb83efb3ea7a3fb9d418ac7adf2379d8cd0c725276a467a2a",
         ]
 
     def tearDown(self):
         pass
-
-    def test_recommend_by_customer(self):
-        actual = models.recommender_by_customer(
-            self.customer,
-            self.dataset,
-            self.full_dummies,
-            groups=2,
-            total_recommendations=6,
-        )
-        expected = self.recommendations
-        self.assertEqual(expected, actual)
 
     def test_knn_recommender(self):
         recommender = models.KnnRecommender(
@@ -58,7 +38,7 @@ class TestModels(unittest.TestCase):
             total_recommendations=6,
         )
         actual = recommender.recommend(self.customer)
-        expected = self.recommendations
+        expected = ['0715624008', '0783388001', '0377277001', '0726925001', '0735843004', '0559630026']
         self.assertEqual(expected, actual)
 
     def test_recommend_all(self):
@@ -79,9 +59,10 @@ class TestModels(unittest.TestCase):
         self.assertEqual(expected, actual)
 
         actual = df.prediction[0]
-        expected = '0795440001 0796137001 0590928022 0599580049'
+
+        expected = '0351484002 0663713001 0870304002 0578020002'
         self.assertEqual(expected, actual)
 
         actual = df.prediction[1]
-        expected = '0625548001 0627759010 0568601006 0797065001'
+        expected = '0715624008 0783388001 0726925001 0735843004'
         self.assertEqual(expected, actual)

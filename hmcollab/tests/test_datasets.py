@@ -105,3 +105,10 @@ class TestDatasets(unittest.TestCase):
         expected = self.dataset.transactions.shape[0]
         self.assertEqual(expected, actual)
 
+        expected = (1, 5)
+        actual = self.dataset.transactions_y.shape
+        self.assertEqual(expected, actual)
+
+        expected = (119, 5)
+        actual = self.dataset.transactions_x.shape
+        self.assertEqual(expected, actual)
