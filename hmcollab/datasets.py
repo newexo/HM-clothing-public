@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 from . import directories
 from hmcollab import transactions
@@ -29,6 +30,10 @@ class HMDatasetDirectoryTree:
     def transactions(self):
         return self.path("transactions_train.csv")
 
+    @property
+    def toy(self):
+        return self.path("transactions_toy.csv")
+
     def image(self, number):
         number = str(number)
         filename = "{}.jpg".format(number)
@@ -38,7 +43,7 @@ class HMDatasetDirectoryTree:
 
 
 class HMDataset:
-    def __init__(self, tree=None):
+    def __init__(self, tree=None, toy=False):
         if tree is None:
             tree = HMDatasetDirectoryTree()
         self.tree = tree
@@ -51,10 +56,23 @@ class HMDataset:
             },
         )
         self.customers = pd.read_csv(self.tree.customers)
-        self.transactions = pd.read_csv(
-            self.tree.transactions,
-            dtype={
-                "article_id": object,
-            },
-        )
+        if toy:
+            self.transactions = pd.read_csv(
+                self.tree.toy,
+                dtype={
+                    "article_id": object,
+                },
+            )
+        else:
+            self.transactions = pd.read_csv(
+                self.tree.transactions,
+                dtype={
+                    "article_id": object,
+                },
+            )
+        self.train, self.test = transactions.transactions_train_test(self.transactions, ids_fraction=0.2)
+        self.train_x, self.train_y = transactions.split_by_time(self.train, days=7)
+        self.test_x, self.test_y = transactions.split_by_time(self.test, days=7)
         self.transactions_x, self.transactions_y = transactions.split_by_time(self.transactions, days=7)
+
+
