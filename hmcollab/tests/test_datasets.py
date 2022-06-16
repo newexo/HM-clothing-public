@@ -100,15 +100,15 @@ class TestDatasets(unittest.TestCase):
         self.assertEqual(expected, actual)
         self.assertEqual(120, self.dataset.transactions.shape[0])
 
-    def test_transactions_y(self):
-        actual = self.dataset.transactions_x.shape[0] + self.dataset.transactions_y.shape[0]
-        expected = self.dataset.transactions.shape[0]
-        self.assertEqual(expected, actual)
-
-        expected = (1, 5)
-        actual = self.dataset.transactions_y.shape
-        self.assertEqual(expected, actual)
-
-        expected = (119, 5)
-        actual = self.dataset.transactions_x.shape
-        self.assertEqual(expected, actual)
+    # def test_transactions_y(self):
+    #     actual = self.dataset.transactions_x.shape[0] + self.dataset.transactions_y.shape[0]
+    #     expected = self.dataset.transactions.shape[0]
+    #     self.assertEqual(expected, actual)
+    #
+    #     expected = (1, 5)
+    #     actual = self.dataset.transactions_y.shape
+    #     self.assertEqual(expected, actual)
+    #
+    #     expected = (119, 5)
+    #     actual = self.dataset.transactions_x.shape
+    #     self.assertEqual(expected, actual)

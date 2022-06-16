@@ -70,9 +70,9 @@ class HMDataset:
                     "article_id": object,
                 },
             )
-        self.train, self.test = transactions.transactions_train_test(self.transactions, ids_fraction=0.2)
-        self.train_x, self.train_y = transactions.split_by_time(self.train, days=7)
-        self.test_x, self.test_y = transactions.split_by_time(self.test, days=7)
-        self.transactions_x, self.transactions_y = transactions.split_by_time(self.transactions, days=7)
+        train, test = transactions.transactions_train_test(self.transactions, ids_fraction=0.2)
+        self.train_x, self.train_y = transactions.split_by_time(train, days=7)
+        self.test_x, self.test_y = transactions.split_by_time(test, days=7)
+        # self.transactions_x, self.transactions_y = transactions.split_by_time(self.transactions, days=7)
 
 

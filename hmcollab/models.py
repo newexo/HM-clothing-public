@@ -12,7 +12,7 @@ class PopularRecommender:
         self.dataset = dataset
         self.full_article_dummies = full_article_dummies
         self.total_recommendations = total_recommendations
-        self.transactions = self.dataset.transactions_x
+        self.transactions = self.dataset.train_x
         self.simple_munger = articles.ArticleFeaturesSimpleFeatures(
             self.dataset.articles
         )
@@ -40,7 +40,7 @@ class KnnRecommender:
         self.full_article_dummies = full_article_dummies
         self.groups = groups
         self.total_recommendations = total_recommendations
-        self.t = transactions.TransactionsByCustomer(self.dataset.transactions_x)
+        self.t = transactions.TransactionsByCustomer(self.dataset.train_x)
         self.simple_munger = articles.ArticleFeaturesSimpleFeatures(
             self.dataset.articles
         )

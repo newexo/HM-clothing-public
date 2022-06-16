@@ -5,10 +5,16 @@ from hmcollab import directories
 from hmcollab import articles
 from hmcollab import models
 
+import warnings
+
+warnings.filterwarnings("ignore")
+
 
 class TestModels(unittest.TestCase):
     def setUp(self):
-        self.tree = datasets.HMDatasetDirectoryTree(base=directories.testdata("ten_customers"))
+        self.tree = datasets.HMDatasetDirectoryTree(
+            base=directories.testdata("ten_customers")
+        )
         self.dataset = datasets.HMDataset(tree=self.tree)
         self.articles_munger = articles.ArticleFeaturesSimpleFeatures(
             self.dataset.articles, use_article_id=True
@@ -38,7 +44,14 @@ class TestModels(unittest.TestCase):
             total_recommendations=6,
         )
         actual = recommender.recommend(self.customer)
-        expected = ['0715624008', '0783388001', '0377277001', '0726925001', '0735843004', '0559630026']
+        expected = [
+            "0715624008",
+            "0783388001",
+            "0377277001",
+            "0726925001",
+            "0735843004",
+            "0559630026",
+        ]
         self.assertEqual(expected, actual)
 
     def test_recommend_all(self):
@@ -54,19 +67,18 @@ class TestModels(unittest.TestCase):
         expected = (2, 2)
         self.assertEqual(expected, actual)
 
-        actual = len(df.prediction[0].split(' '))
+        actual = len(df.prediction[0].split(" "))
         expected = 4
         self.assertEqual(expected, actual)
 
         actual = df.prediction[0]
 
-        expected = '0351484002 0663713001 0870304002 0578020002'
+        expected = "0351484002 0663713001 0870304002 0578020002"
         self.assertEqual(expected, actual)
 
         actual = df.prediction[1]
-        expected = '0715624008 0783388001 0726925001 0735843004'
+        expected = "0715624008 0783388001 0726925001 0735843004"
         self.assertEqual(expected, actual)
-
 
     def test_popular_recommender(self):
         recommender = models.PopularRecommender(
@@ -77,9 +89,21 @@ class TestModels(unittest.TestCase):
 
         # 1. Test recommend
         actual_recommend = recommender.recommend()
-        expected = ['0351484002', '0811835004', '0723529001', '0779136002', '0689898002',
-                     '0599580024', '0797065001', '0800436010', '0599580049', '0590928022',
-                     '0784278001', '0811925005']
+        expected = [
+            "0351484002",
+            "0723529001",
+            "0811835004",
+            "0689898002",
+            "0640174001",
+            "0797065001",
+            "0599580055",
+            "0811927004",
+            "0811925005",
+            "0800436010",
+            "0666448006",
+            "0663713001",
+        ]
+
         self.assertEqual(expected, actual_recommend)
 
         # 2. Test recommend_all
@@ -99,4 +123,3 @@ class TestModels(unittest.TestCase):
         actual = actual_recommend_all.iloc[0, 1]
         expected = " ".join(actual_recommend)
         self.assertEqual(expected, actual)
-
