@@ -29,6 +29,10 @@ class HMDatasetDirectoryTree:
     def transactions(self):
         return self.path("transactions_train.csv")
 
+    # @property
+    # def transactions_y_by_customer(self):
+    #     return self.path("target_set_7d_75481u.csv")
+
     @property
     def toy(self):
         return self.path("transactions_toy.csv")
@@ -39,6 +43,11 @@ class HMDatasetDirectoryTree:
         prefix = number[:3]
         dir = self.images(prefix)
         return os.path.join(dir, filename)
+
+
+def CreateTarget(transactions):
+    transactions_x, transactions_y = transactions.split_by_time(transactions, days=7)
+
 
 
 class HMDataset:
@@ -74,3 +83,6 @@ class HMDataset:
         )
         self.train_x, self.train_y = transactions.split_by_time(train, days=7)
         self.test_x, self.test_y = transactions.split_by_time(test, days=7)
+        # self.transactions_y_by_customer = pd.read_csv(
+        #         self.tree.transactions_y_by_customer)
+

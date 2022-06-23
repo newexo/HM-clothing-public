@@ -4,8 +4,11 @@ from hmcollab import datasets
 from hmcollab import directories
 from hmcollab import articles
 from hmcollab import models
+from hmcollab import scoring
 
 import warnings
+import pandas as pd
+import os
 
 warnings.filterwarnings("ignore")
 
@@ -123,3 +126,18 @@ class TestModels(unittest.TestCase):
         actual = actual_recommend_all.iloc[0, 1]
         expected = " ".join(actual_recommend)
         self.assertEqual(expected, actual)
+
+        # cwd = '/Users/gina/Desktop/Gina/MachineLearning/Proyectos/HM/HM-clothing-project'
+        # y_by_customer = pd.read_csv(cwd+'/data/target_set_7d_75481u.csv')
+        y_by_customer = pd.read_csv(directories.data(filename='target_set_7d_75481u.csv'))
+
+        t = scoring.relevant(actual_recommend_all, y_by_customer)
+        print('\nRelevant:\n', t)
+        print('\nCustomers with transactions in the last 7 days:', t.shape)
+        print('\nCustomers with transactions in the last 7 days:', t[0].shape)
+
+        print('precision_at_k:')
+        for i in range(len(t[0])):
+            print(scoring.precision_at_k(t[0][: i + 1]))
+        print('ap_at_k:', scoring.ap_at_k(t[0]))
+        print('map_at_k:', scoring.map_at_k(t))
