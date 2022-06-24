@@ -4,12 +4,15 @@ import pandas as pd
 
 from hmcollab import datasets
 from hmcollab import directories
+from hmcollab import transactions
 
 
 class TestDatasets(unittest.TestCase):
     def setUp(self):
         self.tree = datasets.HMDatasetDirectoryTree(base=directories.testdata())
         self.dataset = datasets.HMDataset(tree=self.tree)
+        self.x_y_r = datasets.Target(self.dataset.transactions)
+        # self.toy = datasets.HMDataset(toy=True)
 
     def tearDown(self):
         pass
@@ -119,3 +122,29 @@ class TestDatasets(unittest.TestCase):
     #     expected = (119, 5)
     #     actual = self.dataset.transactions_x.shape
     #     self.assertEqual(expected, actual)
+
+    def test_transactions_x_y_r(self):
+        actual = self.x_y_r.transactions.shape[0]
+        expected = self.dataset.transactions.shape[0]
+        self.assertEqual(expected, actual)
+
+        expected = (1, 5)
+        actual = self.x_y_r.transactions_y.shape
+        self.assertEqual(expected, actual)
+
+        expected = (119, 5)
+        actual = self.x_y_r.transactions_x.shape
+        self.assertEqual(expected, actual)
+
+        expected = (1, 2)
+        relevant = self.x_y_r.relevant_set
+        actual = relevant.shape
+        self.assertEqual(expected, actual)
+
+        a_customer = '00000dbacae5abe5e23885899a1fa44253a17956c6d1c3d25f88aa139fdfc657'
+        relevant_slow = datasets.TargetSlow(self.dataset.transactions).relevant_set
+        expected = relevant_slow.loc[relevant_slow.customer_id == a_customer, 'target']
+        actual = relevant.loc[relevant.customer_id == a_customer, 'target']
+        self.assertEqual(expected.values, actual.values)
+
+

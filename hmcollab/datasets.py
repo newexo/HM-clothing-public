@@ -45,9 +45,33 @@ class HMDatasetDirectoryTree:
         return os.path.join(dir, filename)
 
 
-def CreateTarget(transactions):
-    transactions_x, transactions_y = transactions.split_by_time(transactions, days=7)
+class TargetSlow:
+    def __init__(self, transactions_df):
+        def create_relevant_set(df, customer_list):
+            # df is a transactions DataFrame
+            relevant = pd.DataFrame(columns=["target"], index=customer_list)
+            for c in customer_list:
+                relevant.loc[c] = {"target": " ".join(df.loc[df.customer_id == c, 'article_id'])}
+            relevant = relevant.reset_index().rename(columns={"index": "customer_id"})
+            return relevant
+        self.transactions = transactions_df
+        self.transactions_x, self.transactions_y = transactions.split_by_time(self.transactions, days=7)
+        target_ids = self.transactions_y.customer_id.unique()
+        self.relevant_set = create_relevant_set(self.transactions_y, target_ids)
 
+
+class Target:
+    def __init__(self, transactions_df):
+        def relevant_dict(tup):
+            return " ".join(tup[1].loc[:, 'article_id'].tolist())
+
+        self.transactions = transactions_df
+        self.transactions_x, self.transactions_y = transactions.split_by_time(self.transactions, days=7)
+        grouped = self.transactions_y.loc[:, ['customer_id', 'article_id']].groupby(['customer_id'])
+        by_row = {t[0]: relevant_dict(t) for t in grouped}
+        self.relevant_set = pd.DataFrame.from_dict(by_row, orient='index', columns=['target'])
+        self.relevant_set.reset_index(inplace=True)
+        self.relevant_set.rename(columns={'index': 'customer_id'}, inplace=True)
 
 
 class HMDataset:
