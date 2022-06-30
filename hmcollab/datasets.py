@@ -29,9 +29,13 @@ class HMDatasetDirectoryTree:
     def transactions(self):
         return self.path("transactions_train.csv")
 
-    # @property
-    # def transactions_y_by_customer(self):
-    #     return self.path("target_set_7d_75481u.csv")
+    @property
+    def transactions_y_by_customer(self):
+        return self.path("target_set_7d_75481u.csv")
+
+    @property
+    def transactions_y_by_customer_exists(self):
+        return os.path.exists(self.transactions_y_by_customer)
 
     @property
     def toy(self):
@@ -88,6 +92,8 @@ class HMDataset:
             },
         )
         self.customers = pd.read_csv(self.tree.customers)
+
+        self.relevant_set = None
         if toy:
             self.transactions = pd.read_csv(
                 self.tree.toy,
@@ -102,11 +108,20 @@ class HMDataset:
                     "article_id": object,
                 },
             )
-        train, test = transactions.transactions_train_test(
-            self.transactions, ids_fraction=0.2
-        )
-        self.train_x, self.train_y = transactions.split_by_time(train, days=7)
-        self.test_x, self.test_y = transactions.split_by_time(test, days=7)
-        # self.transactions_y_by_customer = pd.read_csv(
-        #         self.tree.transactions_y_by_customer)
+            if self.tree.transactions_y_by_customer_exists:
+                self.relevant_set = pd.read_csv(
+                    self.tree.transactions_y_by_customer,
+                    dtype={
+                        "article_id": object,
+                    },
+                )
+                self.transactions_x, self.transactions_y = transactions.split_by_time(self.transactions, days=7)
 
+        if self.relevant_set is None:
+            target = Target(self.transactions)
+            self.relevant_set = target.relevant_set
+            self.transactions_x, self.transactions_y = target.transactions_x, target.transactions_y
+
+        ids_train, ids_test = transactions.split_ids(self.transactions, fraction=0.2)
+        self.train_x, self.test_x = transactions.transactions_train_test(self.transactions_x, ids_train, ids_test)
+        self.train_y, self.test_y = transactions.transactions_train_test(self.transactions_y, ids_train, ids_test)

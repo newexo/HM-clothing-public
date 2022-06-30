@@ -15,16 +15,16 @@ def split_by_time(df, days):
     return older, newer
 
 
-def transactions_train_test(a_set, ids_fraction=0.2):
-    # a_set: transactions dataset
-    def split_ids(a_set, fraction):
-        full_ids = a_set.customer_id.unique()
-        ids_train, ids_test = train_test_split(
-            full_ids, test_size=fraction, random_state=42
-        )
-        return ids_train, ids_test
+def split_ids(a_set, fraction):
+    full_ids = a_set.customer_id.unique()
+    ids_train, ids_test = train_test_split(
+        full_ids, test_size=fraction, random_state=42
+    )
+    return ids_train, ids_test
 
-    ids_tr, ids_te = split_ids(a_set, ids_fraction)
+
+def transactions_train_test(a_set, ids_tr, ids_te):
+    # a_set: transactions dataset
     train = a_set.loc[a_set.customer_id.isin(ids_tr), :]
     test = a_set.loc[a_set.customer_id.isin(ids_te), :]
     return train, test
