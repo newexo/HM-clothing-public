@@ -18,7 +18,7 @@ def relevant(predicted, target):
 
     # Keep only customers with transactions at target set (inner)
     both = predicted.merge(target, on=['customer_id'], how='inner')
-    return both.apply(lambda x: compare_one(x.prediction, x.last_7d), axis=1)
+    return both.apply(lambda x: compare_one(x.prediction, x.target), axis=1)
 
 
 def precision_at_k(ranked_results):
