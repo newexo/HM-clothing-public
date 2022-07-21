@@ -46,7 +46,11 @@ class TestModels(unittest.TestCase):
             groups=2,
             total_recommendations=6,
         )
+        print('\nregular')
+        print('groups', recommender.groups)
         actual = recommender.recommend(self.customer)
+
+        print(actual)
         expected = [
             "0715624008",
             "0783388001",
@@ -56,6 +60,17 @@ class TestModels(unittest.TestCase):
             "0559630026",
         ]
         self.assertEqual(expected, actual)
+
+    # def test_knn_recommender_extras(self):
+    #     recommender = models.KnnRecommender(
+    #         self.dataset,
+    #         self.full_dummies,
+    #         groups=4,
+    #         total_recommendations=6,
+    #     )
+    #     actual = recommender.recommend(self.customer)
+    #     expected = ['0735843004', '0559630026', '0726925001', '0599580055']
+    #     self.assertEqual(expected, actual)
 
     def test_recommend_all(self):
         recommender = models.KnnRecommender(

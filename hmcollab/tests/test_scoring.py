@@ -113,3 +113,4 @@ class TestScoring(unittest.TestCase):
         expected = (a0 + a1 + a2) / 3
         actual = map_at_k(results)
         self.assertEqual(expected, actual)
+

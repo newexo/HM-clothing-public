@@ -41,6 +41,7 @@ class KnnRecommender:
         self.groups = groups
         self.total_recommendations = total_recommendations
         self.t = transactions.TransactionsByCustomer(self.dataset.train_x)
+        # self.t = transactions.TransactionsByCustomer(self.dataset.transactions_x)
         self.simple_munger = articles.ArticleFeaturesSimpleFeatures(
             self.dataset.articles
         )
@@ -54,8 +55,13 @@ class KnnRecommender:
     def recommend(self, customer):
         recomendation_ids = []
         customer_dummies = self.t.customer_dummies(customer, self.full_article_dummies)
-        all_groups = transactions.kmeans_consumer(customer_dummies, k=self.groups)
-        for i in range(self.groups):
+        min_k = self.groups
+        print('customer_dummies', customer_dummies.shape[0])
+        if customer_dummies.shape[0] < self.groups:
+            print('Customer with few obs: ', customer)
+            min_k = customer_dummies.shape[0]   # so far it will produce less recommendations for this customer
+        all_groups = transactions.kmeans_consumer(customer_dummies, k=min_k)
+        for i in range(min_k):
             one_group = all_groups.cluster_centers_[i]
             _, indices = self.model.nearest(row=one_group)
             for r in indices[0][: self.recomendations_by_group]:
