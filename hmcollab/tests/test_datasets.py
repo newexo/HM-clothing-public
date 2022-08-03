@@ -1,5 +1,6 @@
 import unittest
 import os
+import pandas as pd
 
 from hmcollab import datasets
 from hmcollab import directories
@@ -99,6 +100,12 @@ class TestDatasets(unittest.TestCase):
         actual = list(self.dataset.transactions.columns)
         self.assertEqual(expected, actual)
         self.assertEqual(120, self.dataset.transactions.shape[0])
+
+    def test_target_vs_last7d(self):
+        # Target dataset should have column target rather than column last7d
+        df = pd.read_csv(directories.data("target_set_7d_75481u.csv"), nrows=20)
+        self.assertNotIn("last_7d", df.columns)
+        self.assertIn("target", df.columns)
 
     # def test_transactions_y(self):
     #     actual = self.dataset.transactions_x.shape[0] + self.dataset.transactions_y.shape[0]
