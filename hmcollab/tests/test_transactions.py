@@ -4,6 +4,7 @@ from numpy.linalg import norm
 from sklearn.cluster import KMeans
 import pandas as pd
 
+import hmcollab.splitter
 from hmcollab import datasets
 from hmcollab import directories
 from hmcollab import articles
@@ -40,13 +41,13 @@ class TestTransactions(unittest.TestCase):
         # so far we are testing the number of rows after the split
         # TODO: expand
         six_transactions = self.dataset.transactions.iloc[:6].copy()
-        y, x = transactions.split_by_time(six_transactions, self.days)
+        y, x = hmcollab.splitter.split_by_time(six_transactions, self.days)
         self.assertEqual(3, y.shape[0])
         self.assertEqual(3, x.shape[0])
 
     def test_slit_by_time_first_six(self):
         six_transactions = self.dataset.transactions.iloc[:6].copy()
-        x, y = transactions.split_by_time(six_transactions, self.days)
+        x, y = hmcollab.splitter.split_by_time(six_transactions, self.days)
 
         # verify that returned dataframes have correct columns
         expected = ["t_dat", "customer_id", "article_id", "price", "sales_channel_id"]

@@ -1,8 +1,9 @@
 import os
 import pandas as pd
 
+import hmcollab.splitter
 from . import directories
-from hmcollab import transactions
+from .three_part_dataset import ThreePartDataset
 
 
 class HMDatasetDirectoryTree:
@@ -55,11 +56,16 @@ class TargetSlow:
             # df is a transactions DataFrame
             relevant = pd.DataFrame(columns=["target"], index=customer_list)
             for c in customer_list:
-                relevant.loc[c] = {"target": " ".join(df.loc[df.customer_id == c, 'article_id'])}
+                relevant.loc[c] = {
+                    "target": " ".join(df.loc[df.customer_id == c, "article_id"])
+                }
             relevant = relevant.reset_index().rename(columns={"index": "customer_id"})
             return relevant
+
         self.transactions = transactions_df
-        self.transactions_x, self.transactions_y = transactions.split_by_time(self.transactions, days=7)
+        self.transactions_x, self.transactions_y = hmcollab.splitter.split_by_time(
+            self.transactions, days=7
+        )
         target_ids = self.transactions_y.customer_id.unique()
         self.relevant_set = create_relevant_set(self.transactions_y, target_ids)
 
@@ -67,23 +73,29 @@ class TargetSlow:
 class Target:
     def __init__(self, transactions_df):
         def relevant_dict(tup):
-            return " ".join(tup[1].loc[:, 'article_id'].tolist())
+            return " ".join(tup[1].loc[:, "article_id"].tolist())
 
         self.transactions = transactions_df
-        self.transactions_x, self.transactions_y = transactions.split_by_time(self.transactions, days=7)
-        grouped = self.transactions_y.loc[:, ['customer_id', 'article_id']].groupby(['customer_id'])
+        self.transactions_x, self.transactions_y = hmcollab.splitter.split_by_time(
+            self.transactions, days=7
+        )
+        grouped = self.transactions_y.loc[:, ["customer_id", "article_id"]].groupby(
+            ["customer_id"]
+        )
         by_row = {t[0]: relevant_dict(t) for t in grouped}
-        self.relevant_set = pd.DataFrame.from_dict(by_row, orient='index', columns=['target'])
+        self.relevant_set = pd.DataFrame.from_dict(
+            by_row, orient="index", columns=["target"]
+        )
         self.relevant_set.reset_index(inplace=True)
-        self.relevant_set.rename(columns={'index': 'customer_id'}, inplace=True)
+        self.relevant_set.rename(columns={"index": "customer_id"}, inplace=True)
 
 
-class HMDataset:
+class HMDataset(ThreePartDataset):
     def __init__(self, tree=None, toy=False):
         if tree is None:
             tree = HMDatasetDirectoryTree()
         self.tree = tree
-        self.articles = pd.read_csv(
+        articles = pd.read_csv(
             self.tree.articles,
             dtype={
                 "article_id": object,
@@ -91,18 +103,18 @@ class HMDataset:
                 "colour_group_code": object,
             },
         )
-        self.customers = pd.read_csv(self.tree.customers)
+        customers = pd.read_csv(self.tree.customers)
 
         self.relevant_set = None
         if toy:
-            self.transactions = pd.read_csv(
+            transactions = pd.read_csv(
                 self.tree.toy,
                 dtype={
                     "article_id": object,
                 },
             )
         else:
-            self.transactions = pd.read_csv(
+            transactions = pd.read_csv(
                 self.tree.transactions,
                 dtype={
                     "article_id": object,
@@ -115,13 +127,27 @@ class HMDataset:
                         "article_id": object,
                     },
                 )
-                self.transactions_x, self.transactions_y = transactions.split_by_time(self.transactions, days=7)
+                (
+                    self.transactions_x,
+                    self.transactions_y,
+                ) = hmcollab.splitter.split_by_time(self.transactions, days=7)
+
+        ThreePartDataset.__init__(self, articles, customers, transactions)
 
         if self.relevant_set is None:
             target = Target(self.transactions)
             self.relevant_set = target.relevant_set
-            self.transactions_x, self.transactions_y = target.transactions_x, target.transactions_y
+            self.transactions_x, self.transactions_y = (
+                target.transactions_x,
+                target.transactions_y,
+            )
 
-        ids_train, ids_test = transactions.split_ids(self.transactions, fraction=0.2)
-        self.train_x, self.test_x = transactions.transactions_train_test(self.transactions_x, ids_train, ids_test)
-        self.train_y, self.test_y = transactions.transactions_train_test(self.transactions_y, ids_train, ids_test)
+        ids_train, ids_test = hmcollab.splitter.split_ids(
+            self.transactions, fraction=0.2
+        )
+        self.train_x, self.test_x = hmcollab.splitter.transactions_train_test(
+            self.transactions_x, ids_train, ids_test
+        )
+        self.train_y, self.test_y = hmcollab.splitter.transactions_train_test(
+            self.transactions_y, ids_train, ids_test
+        )
