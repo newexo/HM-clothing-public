@@ -91,7 +91,7 @@ class Target:
 
 
 class HMDataset(ThreePartDataset):
-    def __init__(self, tree=None, toy=False):
+    def __init__(self, tree=None, toy=False, folds=True):
         if tree is None:
             tree = HMDatasetDirectoryTree()
         self.tree = tree
@@ -142,12 +142,41 @@ class HMDataset(ThreePartDataset):
                 target.transactions_y,
             )
 
-        ids_train, ids_test = hmcollab.splitter.split_ids(
-            self.transactions, fraction=0.2
-        )
-        self.train_x, self.test_x = hmcollab.splitter.transactions_train_test(
-            self.transactions_x, ids_train, ids_test
-        )
-        self.train_y, self.test_y = hmcollab.splitter.transactions_train_test(
-            self.transactions_y, ids_train, ids_test
-        )
+        # ids_train, ids_test = hmcollab.splitter.split_ids(
+        #     self.transactions, fraction=0.2
+        # )
+        # self.train_x, self.test_x = hmcollab.splitter.transactions_train_test(
+        #     self.transactions_x, ids_train, ids_test
+        # )
+        # self.train_y, self.test_y = hmcollab.splitter.transactions_train_test(
+        #     self.t
+
+        if folds:
+            # Train: 60%, val: 20%, test: 20%
+            # Creating test set
+            ids_train, ids_test = hmcollab.splitter.split_ids(
+                self.transactions, fraction=0.2
+            )
+            train_x, self.test_x = hmcollab.splitter.transactions_train_test(
+                self.transactions_x, ids_train, ids_test
+            )
+            train_y, self.test_y = hmcollab.splitter.transactions_train_test(
+                self.transactions_y, ids_train, ids_test
+            )
+            # Creating training and validation sets
+            ids_train, ids_val = hmcollab.splitter.split_ids(
+                train_x, fraction=0.25
+            )  # 25% of training is 20% from the total: 80(.25)=20
+            self.train_x, self.val_x = hmcollab.splitter.transactions_train_test(
+                train_x, ids_train, ids_val
+            )
+            self.train_y, self.val_y = hmcollab.splitter.transactions_train_test(
+                train_y, ids_train, ids_val
+            )
+
+        else:
+            # Splitting by leave last week. Note that train_x is used to train all (train, validations and test)
+            # train_vy is the target variable for validation to use with train data
+            self.train_y = self.transactions_y
+            self.train_x, self.train_vy = hmcollab.splitter.split_by_time(self.transactions_x, days=7)
+
