@@ -33,10 +33,18 @@ def transactions_train_test(a_set, ids_tr, ids_te):
 
 
 class CustomerPortion:
-    def __init__(self, ids):
-        self.ids = ids
+    def __init__(self, customers_ids):
+        self.customers_ids = customers_ids
 
     def split(self, dataset: ThreePartDataset):
-        a_set = dataset.transactions
-        transactions = a_set.loc[a_set.customer_id.isin(self.ids), :]
-        return ThreePartDataset(dataset.articles, dataset.customers, transactions)
+        customers = dataset.customers.loc[
+            dataset.customers.customer_id.isin(self.customers_ids), :
+        ]
+        transactions = dataset.transactions.loc[
+            dataset.transactions.customer_id.isin(self.customers_ids), :
+        ]
+        article_ids = transactions.article_id.unique()
+        articles = dataset.articles.loc[
+            dataset.articles.article_id.isin(article_ids), :
+        ]
+        return ThreePartDataset(articles, customers, transactions)
