@@ -91,7 +91,7 @@ class Target:
 
 
 class HMDataset(ThreePartDataset):
-    def __init__(self, tree=None, toy=False, folds=True):
+    def __init__(self, tree=None, toy=False, folds='twosets'):
         if tree is None:
             tree = HMDatasetDirectoryTree()
         self.tree = tree
@@ -142,16 +142,18 @@ class HMDataset(ThreePartDataset):
                 target.transactions_y,
             )
 
-        # ids_train, ids_test = hmcollab.splitter.split_ids(
-        #     self.transactions, fraction=0.2
-        # )
-        # self.train_x, self.test_x = hmcollab.splitter.transactions_train_test(
-        #     self.transactions_x, ids_train, ids_test
-        # )
-        # self.train_y, self.test_y = hmcollab.splitter.transactions_train_test(
-        #     self.t
+        if folds=='twosets':
+            ids_train, ids_test = hmcollab.splitter.split_ids(
+                self.transactions, fraction=0.2
+            )
+            self.train_x, self.test_x = hmcollab.splitter.transactions_train_test(
+                self.transactions_x, ids_train, ids_test
+            )
+            self.train_y, self.test_y = hmcollab.splitter.transactions_train_test(
+                self.transactions_y, ids_train, ids_test
+            )
 
-        if folds:
+        if folds=='threesets':
             # Train: 60%, val: 20%, test: 20%
             # Creating test set
             ids_train, ids_test = hmcollab.splitter.split_ids(
@@ -174,7 +176,7 @@ class HMDataset(ThreePartDataset):
                 train_y, ids_train, ids_val
             )
 
-        else:
+        if folds=='standard':
             # Splitting by leave last week. Note that train_x is used to train all (train, validations and test)
             # train_vy is the target variable for validation to use with train data
             self.train_y = self.transactions_y
