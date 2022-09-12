@@ -130,7 +130,7 @@ class HMDataset(ThreePartDataset):
                 (
                     self.transactions_x,
                     self.transactions_y,
-                ) = hmcollab.splitter.split_by_time(self.transactions, days=7)
+                ) = hmcollab.splitter.split_by_time(transactions, days=7)
 
         ThreePartDataset.__init__(self, articles, customers, transactions)
 
