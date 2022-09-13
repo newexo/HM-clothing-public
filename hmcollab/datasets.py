@@ -90,6 +90,26 @@ class Target:
         self.relevant_set.rename(columns={"index": "customer_id"}, inplace=True)
 
 
+def target_to_relevant(trans_y):
+    """Convert to dataframe of customers with a list of transactions from the input set
+    """
+
+    def relevant_dict(tup):
+        return " ".join(tup[1].loc[:, "article_id"].tolist())
+
+    grouped = trans_y.loc[:, ["customer_id", "article_id"]].groupby(
+        ["customer_id"]
+    )
+    by_row = {t[0]: relevant_dict(t) for t in grouped}
+    relevant_set = pd.DataFrame.from_dict(
+        by_row, orient="index", columns=["target"]
+    )
+    relevant_set.reset_index(inplace=True)
+    relevant_set.rename(columns={"index": "customer_id"}, inplace=True)
+
+    return relevant_set
+
+
 class HMDataset(ThreePartDataset):
     def __init__(self, tree=None, toy=False, folds='twosets'):
         if tree is None:
