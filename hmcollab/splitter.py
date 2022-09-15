@@ -5,9 +5,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from hmcollab.three_part_dataset import (
-    ThreePartDataset,
-)
+from hmcollab.three_part_dataset import ThreePartDataset
 
 
 def split_by_time(df, days):
