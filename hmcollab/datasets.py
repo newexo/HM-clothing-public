@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 
 import hmcollab.splitter
 from . import directories
@@ -176,8 +177,9 @@ class HMDataset(ThreePartDataset):
         if folds=='threesets':
             # Train: 60%, val: 20%, test: 20%
             # Creating test set
+            random_state = np.random.RandomState(42)
             ids_train, ids_test = hmcollab.splitter.split_ids(
-                self.transactions, fraction=0.2
+                self.transactions, fraction=0.2, random_state=random_state
             )
             train_x, self.test_x = hmcollab.splitter.transactions_train_test(
                 self.transactions_x, ids_train, ids_test
@@ -187,7 +189,7 @@ class HMDataset(ThreePartDataset):
             )
             # Creating training and validation sets
             ids_train, ids_val = hmcollab.splitter.split_ids(
-                train_x, fraction=0.25
+                train_x, fraction=0.25, random_state=random_state
             )  # 25% of training is 20% from the total: 80(.25)=20
             self.train_x, self.val_x = hmcollab.splitter.transactions_train_test(
                 train_x, ids_train, ids_val
