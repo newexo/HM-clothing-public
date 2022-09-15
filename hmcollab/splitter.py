@@ -1,10 +1,13 @@
 import datetime
+from abc import ABCMeta, abstractmethod
 
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from hmcollab.three_part_dataset import ThreePartDataset
+from hmcollab.three_part_dataset import (
+    ThreePartDataset,
+)
 
 
 def split_by_time(df, days):
@@ -33,21 +36,49 @@ def transactions_train_test(a_set, ids_tr, ids_te):
     return train, test
 
 
-class CustomerPortion:
-    def __init__(self, customers_ids):
-        self.customers_ids = customers_ids
+class Portion(metaclass=ABCMeta):
+    def split(self, dataset):
+        transactions = self._get_transaction_portion(dataset)
+        customers = prune_customers(dataset.customers, transactions=transactions)
+        articles = prune_articles(dataset.articles, transactions=transactions)
+        return ThreePartDataset(articles, customers, transactions)
+
+    @abstractmethod
+    def _get_transaction_portion(self, dataset):
+        pass
+
+
+class OlderPortion(Portion):
+    def __init__(self, days):
+        self.days = days
+
+    def _get_transaction_portion(self, dataset):
+        older, newer = split_by_time(dataset.transactions, self.days)
+        return older
+
+
+class NewerPortion(Portion):
+    def __init__(self, days):
+        self.days = days
+
+    def _get_transaction_portion(self, dataset):
+        older, newer = split_by_time(dataset.transactions, self.days)
+        return newer
+
+
+class CustomerPortion(Portion):
+    def __init__(self, customer_ids):
+        self.customer_ids = customer_ids
+
+    def _get_transaction_portion(self, dataset):
+        return dataset.transactions.loc[
+            dataset.transactions.customer_id.isin(self.customer_ids), :
+        ]
 
     def split(self, dataset: ThreePartDataset):
-        customers = dataset.customers.loc[
-            dataset.customers.customer_id.isin(self.customers_ids), :
-        ]
-        transactions = dataset.transactions.loc[
-            dataset.transactions.customer_id.isin(self.customers_ids), :
-        ]
-        article_ids = transactions.article_id.unique()
-        articles = dataset.articles.loc[
-            dataset.articles.article_id.isin(article_ids), :
-        ]
+        transactions = self._get_transaction_portion(dataset)
+        customers = prune_customers(dataset.customers, customer_ids=self.customer_ids)
+        articles = prune_articles(dataset.articles, transactions=transactions)
         return ThreePartDataset(articles, customers, transactions)
 
 
@@ -114,3 +145,15 @@ class SplitByCustomerTrainTestValidationStrategy(SplitByCustomerStrategy):
     @property
     def validation(self):
         return self.partition[2]
+
+
+def prune_customers(customers, customer_ids=None, transactions=None):
+    if transactions is not None:
+        customer_ids = transactions.customer_id.unique()
+    return customers.loc[customers.customer_id.isin(customer_ids), :]
+
+
+def prune_articles(articles, article_ids=None, transactions=None):
+    if transactions is not None:
+        article_ids = transactions.article_id.unique()
+    return articles.loc[articles.article_id.isin(article_ids), :]

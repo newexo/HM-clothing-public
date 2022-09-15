@@ -40,6 +40,45 @@ class TestSplitter(unittest.TestCase):
         cutoff_date = new_max - datetime.timedelta(days=20)
         self.assertLess(old_max, cutoff_date)
 
+    def test_older_newer_portions_transactions(self):
+        op = splitter.OlderPortion(20).split(self.dataset)
+        np = splitter.NewerPortion(20).split(self.dataset)
+        older = op.transactions
+        newer = np.transactions
+
+        self.assertEqual(
+            self.dataset.transactions.shape[0], older.shape[0] + newer.shape[0]
+        )
+        new_min = newer.t_dat.min()
+        new_max = newer.t_dat.max()
+        old_min = older.t_dat.min()
+        old_max = older.t_dat.max()
+
+        self.assertGreater(new_min, old_max)
+
+        self.assertEqual(new_max, self.dataset.transactions.t_dat.max())
+        self.assertEqual(old_min, self.dataset.transactions.t_dat.min())
+
+        cutoff_date = new_max - datetime.timedelta(days=20)
+        self.assertLess(old_max, cutoff_date)
+
+    def test_prune_customers(self):
+        customer_ids = {
+            "bed6979e4c947ad451fad7235ffab1e61ad95517e8cf26cb9e9d68a4decc9b5f",
+            "00005ca1c9ed5f5146b52ac8639a40ca9d57aeff4d1bd2c5feb1ca5dff07c43e",
+            "d3b658f59ad9bbf6249a7bf0db722f2f43cc47803d03299a3feb24487f1b6fbe",}
+        pruned_customers = splitter.prune_customers(self.dataset.customers, customer_ids=customer_ids)
+        expected = customer_ids
+        actual = set(pruned_customers.customer_id.unique())
+        self.assertEqual(expected, actual)
+
+    def test_prune_articles(self):
+        article_ids = {'0456163085', '0456163086', '0768847001', '0568601043',}
+        pruned_articles = splitter.prune_articles(self.dataset.articles, article_ids=article_ids)
+        expected = article_ids
+        actual = set(pruned_articles.article_id.unique())
+        self.assertEqual(expected, actual)
+
     def test_split_by_ids(self):
         full_ids = self.dataset.customers.customer_id.unique()
         full_ids = set(full_ids)
