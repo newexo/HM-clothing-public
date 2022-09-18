@@ -1,54 +1,9 @@
-import os
 import pandas as pd
 import numpy as np
 
 import hmcollab.splitter
-from . import directories
+from .directory_tree import HMDatasetDirectoryTree
 from .three_part_dataset import ThreePartDataset
-
-
-class HMDatasetDirectoryTree:
-    def __init__(self, base=None):
-        if base is None:
-            base = directories.data()
-        self._base = base
-
-    def path(self, filename=None):
-        return directories.qualifyname(self._base, filename)
-
-    def images(self, filename=None):
-        return directories.qualifyname(self.path("images"), filename)
-
-    @property
-    def customers(self):
-        return self.path("customers.csv")
-
-    @property
-    def articles(self):
-        return self.path("articles.csv")
-
-    @property
-    def transactions(self):
-        return self.path("transactions_train.csv")
-
-    @property
-    def transactions_y_by_customer(self):
-        return self.path("target_set_7d_75481u.csv")
-
-    @property
-    def transactions_y_by_customer_exists(self):
-        return os.path.exists(self.transactions_y_by_customer)
-
-    @property
-    def toy(self):
-        return self.path("transactions_toy.csv")
-
-    def image(self, number):
-        number = str(number)
-        filename = "{}.jpg".format(number)
-        prefix = number[:3]
-        dir = self.images(prefix)
-        return os.path.join(dir, filename)
 
 
 class TargetSlow:
@@ -92,19 +47,14 @@ class Target:
 
 
 def target_to_relevant(trans_y):
-    """Convert to dataframe of customers with a list of transactions from the input set
-    """
+    """Convert to dataframe of customers with a list of transactions from the input set"""
 
     def relevant_dict(tup):
         return " ".join(tup[1].loc[:, "article_id"].tolist())
 
-    grouped = trans_y.loc[:, ["customer_id", "article_id"]].groupby(
-        ["customer_id"]
-    )
+    grouped = trans_y.loc[:, ["customer_id", "article_id"]].groupby(["customer_id"])
     by_row = {t[0]: relevant_dict(t) for t in grouped}
-    relevant_set = pd.DataFrame.from_dict(
-        by_row, orient="index", columns=["target"]
-    )
+    relevant_set = pd.DataFrame.from_dict(by_row, orient="index", columns=["target"])
     relevant_set.reset_index(inplace=True)
     relevant_set.rename(columns={"index": "customer_id"}, inplace=True)
 
@@ -112,7 +62,7 @@ def target_to_relevant(trans_y):
 
 
 class HMDataset(ThreePartDataset):
-    def __init__(self, tree=None, toy=False, folds='twosets'):
+    def __init__(self, tree=None, toy=False, folds="twosets"):
         if tree is None:
             tree = HMDatasetDirectoryTree()
         self.tree = tree
@@ -163,7 +113,7 @@ class HMDataset(ThreePartDataset):
                 target.transactions_y,
             )
 
-        if folds=='twosets':
+        if folds == "twosets":
             ids_train, ids_test = hmcollab.splitter.split_ids(
                 self.transactions, fraction=0.2
             )
@@ -174,7 +124,7 @@ class HMDataset(ThreePartDataset):
                 self.transactions_y, ids_train, ids_test
             )
 
-        if folds=='threesets':
+        if folds == "threesets":
             # Train: 60%, val: 20%, test: 20%
             # Creating test set
             random_state = np.random.RandomState(42)
@@ -198,9 +148,10 @@ class HMDataset(ThreePartDataset):
                 train_y, ids_train, ids_val
             )
 
-        if folds=='standard':
+        if folds == "standard":
             # Splitting by leave last week. Note that train_x is used to train all (train, validations and test)
             # train_vy is the target variable for validation to use with train data
             self.train_y = self.transactions_y
-            self.train_x, self.train_vy = hmcollab.splitter.split_by_time(self.transactions_x, days=7)
-
+            self.train_x, self.train_vy = hmcollab.splitter.split_by_time(
+                self.transactions_x, days=7
+            )

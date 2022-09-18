@@ -2,21 +2,26 @@ import unittest
 import os
 import pandas as pd
 
+from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab import datasets
 from hmcollab import directories
 
 
 class TestDatasets(unittest.TestCase):
     def setUp(self):
-        self.tree = datasets.HMDatasetDirectoryTree(base=directories.testdata())
+        self.tree = HMDatasetDirectoryTree(base=directories.testdata())
         self.dataset = datasets.HMDataset(tree=self.tree)
         self.x_y_r = datasets.Target(self.dataset.transactions)
+        self.larger_tree = HMDatasetDirectoryTree(
+            base=directories.testdata("forty_more_customers")
+        )
+        self.larger_dataset = datasets.HMDataset(tree=self.larger_tree)
 
     def tearDown(self):
         pass
 
     def test_directory_tree(self):
-        tree = datasets.HMDatasetDirectoryTree(base="base")
+        tree = HMDatasetDirectoryTree(base="base")
         expected = "base"
         actual = tree.path()
         self.assertEqual(expected, actual)
@@ -42,7 +47,7 @@ class TestDatasets(unittest.TestCase):
         self.assertEqual(expected, actual)
 
         expected = directories.data()
-        actual = datasets.HMDatasetDirectoryTree().path()
+        actual = HMDatasetDirectoryTree().path()
         self.assertEqual(expected, actual)
 
     def test_trees_directories_exist(self):
@@ -134,19 +139,6 @@ class TestDatasets(unittest.TestCase):
         self.assertNotIn("last_7d", df.columns)
         self.assertIn("target", df.columns)
 
-    # def test_transactions_y(self):
-    #     actual = self.dataset.transactions_x.shape[0] + self.dataset.transactions_y.shape[0]
-    #     expected = self.dataset.transactions.shape[0]
-    #     self.assertEqual(expected, actual)
-    #
-    #     expected = (1, 5)
-    #     actual = self.dataset.transactions_y.shape
-    #     self.assertEqual(expected, actual)
-    #
-    #     expected = (119, 5)
-    #     actual = self.dataset.transactions_x.shape
-    #     self.assertEqual(expected, actual)
-
     def test_transactions_x_y_r(self):
         actual = self.x_y_r.transactions_x.shape[0] + self.x_y_r.transactions_y.shape[0]
         expected = self.dataset.transactions.shape[0]
@@ -170,3 +162,85 @@ class TestDatasets(unittest.TestCase):
         expected = relevant_slow.loc[relevant_slow.customer_id == a_customer, "target"]
         actual = relevant.loc[relevant.customer_id == a_customer, "target"]
         self.assertEqual(expected.values, actual.values)
+
+    def test_relevant(self):
+        expected = ["customer_id", "target"]
+        actual = list(self.dataset.relevant_set.columns)
+        self.assertEqual(expected, actual)
+
+        expected = set(self.dataset.transactions_y.customer_id.unique())
+        actual = set(self.dataset.relevant_set.customer_id.unique())
+        self.assertEqual(expected, actual)
+
+        expected = ["0568601043"]
+        actual = list(self.dataset.relevant_set.target)
+        self.assertEqual(expected, actual)
+
+    def test_larger_relevant(self):
+        expected = ["customer_id", "target"]
+        actual = list(self.larger_dataset.relevant_set.columns)
+        self.assertEqual(expected, actual)
+
+        expected = set(self.larger_dataset.transactions_y.customer_id.unique())
+        actual = set(self.larger_dataset.relevant_set.customer_id.unique())
+        self.assertEqual(expected, actual)
+
+        expected = ["0794321007", "0806050001 0826505003 0921671001 0918516001"]
+        actual = list(self.larger_dataset.relevant_set.target)
+        self.assertEqual(expected, actual)
+
+    def test_toy(self):
+        dataset = datasets.HMDataset(tree=self.larger_tree, toy=True)
+        expected = (120, 5)
+        actual = dataset.transactions.shape
+        self.assertEqual(expected, actual)
+
+        actual = set(dataset.transactions.customer_id.unique())
+        self.assertEqual(5, len(actual))
+        expected = {
+            "cb37880afc6777d7c63ecc851086aadc3ed06b5bec1975ea892430f3013c792c",
+            "00000dbacae5abe5e23885899a1fa44253a17956c6d1c3d25f88aa139fdfc657",
+            "18cfbd899a5f5f3b4bc0a0430104e0fd436c9fb10402eb184d95582a9f59d8b3",
+            "0000423b00ade91418cceaf3b26c6af3dd342b51fd051eec9c12fb36984420fa",
+            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
+        }
+        self.assertEqual(expected, actual)
+
+    def test_larger(self):
+        expected = (53, 7)
+        actual = self.larger_dataset.customers.shape
+        self.assertEqual(expected, actual)
+
+        expected = (1223, 25)
+        actual = self.larger_dataset.articles.shape
+        self.assertEqual(expected, actual)
+
+        expected = (1557, 5)
+        actual = self.larger_dataset.transactions.shape
+        self.assertEqual(expected, actual)
+
+        expected = (1552, 5)
+        actual = self.larger_dataset.transactions_x.shape
+        self.assertEqual(expected, actual)
+
+        expected = (5, 5)
+        actual = self.larger_dataset.transactions_y.shape
+        self.assertEqual(expected, actual)
+
+        expected = (1378, 5)
+        actual = self.larger_dataset.train_x.shape
+        self.assertEqual(expected, actual)
+
+        expected = (5, 5)
+        actual = self.larger_dataset.train_y.shape
+        self.assertEqual(expected, actual)
+
+    def test_twosets(self):
+        ds = datasets.HMDataset(tree=self.tree, folds="twosets")
+        self.fail("incomplete")
+
+    def test_threesets(self):
+        self.fail("incomplete")
+
+    def test_standard(self):
+        self.fail("incomplete")

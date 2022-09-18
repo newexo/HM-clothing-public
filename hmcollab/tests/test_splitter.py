@@ -3,6 +3,7 @@ import unittest
 import datetime
 import numpy as np
 
+from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab import datasets
 from hmcollab import directories
 from hmcollab import splitter
@@ -10,7 +11,7 @@ from hmcollab import splitter
 
 class TestSplitter(unittest.TestCase):
     def setUp(self):
-        self.tree = datasets.HMDatasetDirectoryTree(
+        self.tree = HMDatasetDirectoryTree(
             base=directories.testdata("forty_more_customers")
         )
         self.dataset = datasets.HMDataset(tree=self.tree)
@@ -66,15 +67,25 @@ class TestSplitter(unittest.TestCase):
         customer_ids = {
             "bed6979e4c947ad451fad7235ffab1e61ad95517e8cf26cb9e9d68a4decc9b5f",
             "00005ca1c9ed5f5146b52ac8639a40ca9d57aeff4d1bd2c5feb1ca5dff07c43e",
-            "d3b658f59ad9bbf6249a7bf0db722f2f43cc47803d03299a3feb24487f1b6fbe",}
-        pruned_customers = splitter.prune_customers(self.dataset.customers, customer_ids=customer_ids)
+            "d3b658f59ad9bbf6249a7bf0db722f2f43cc47803d03299a3feb24487f1b6fbe",
+        }
+        pruned_customers = splitter.prune_customers(
+            self.dataset.customers, customer_ids=customer_ids
+        )
         expected = customer_ids
         actual = set(pruned_customers.customer_id.unique())
         self.assertEqual(expected, actual)
 
     def test_prune_articles(self):
-        article_ids = {'0456163085', '0456163086', '0768847001', '0568601043',}
-        pruned_articles = splitter.prune_articles(self.dataset.articles, article_ids=article_ids)
+        article_ids = {
+            "0456163085",
+            "0456163086",
+            "0768847001",
+            "0568601043",
+        }
+        pruned_articles = splitter.prune_articles(
+            self.dataset.articles, article_ids=article_ids
+        )
         expected = article_ids
         actual = set(pruned_articles.article_id.unique())
         self.assertEqual(expected, actual)

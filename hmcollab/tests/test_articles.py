@@ -4,6 +4,7 @@ import numpy as np
 from numpy.linalg import norm
 import pandas as pd
 
+from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab import articles
 from hmcollab import datasets
 from hmcollab import directories
@@ -11,12 +12,12 @@ from hmcollab import directories
 # just for testing
 def dummy_features(df, columns):
     # for articles
-    return pd.get_dummies(df[['article_id'] + columns], columns=columns, prefix=columns)
+    return pd.get_dummies(df[["article_id"] + columns], columns=columns, prefix=columns)
 
 
 class TestArticles(unittest.TestCase):
     def setUp(self):
-        self.tree = datasets.HMDatasetDirectoryTree(base=directories.testdata())
+        self.tree = HMDatasetDirectoryTree(base=directories.testdata())
         self.dataset = datasets.HMDataset(tree=self.tree)
         self.simple_onehot = np.load(directories.testdata("simple_onehot.npy"))
 
@@ -27,7 +28,7 @@ class TestArticles(unittest.TestCase):
         return articles.ArticleFeaturesSimpleFeatures(self.dataset.articles.iloc[:17])
 
     def get_simple_knn(self):
-        return  articles.ArticleKNN(self.get_simple(), 4)
+        return articles.ArticleKNN(self.get_simple(), 4)
 
     def test_article_simple_feature_array(self):
         a = self.get_simple()
@@ -65,7 +66,7 @@ class TestArticles(unittest.TestCase):
         self.assertEqual(0, norm(actual - expected))
 
         # check that actual indices match expected
-        expected = {12, 10,  2,  1}
+        expected = {12, 10, 2, 1}
         actual = set(indices[0])
         self.assertEqual(expected, actual)
 
@@ -82,7 +83,7 @@ class TestArticles(unittest.TestCase):
         self.assertEqual(0, norm(actual - expected))
 
         # check that actual indices match expected
-        expected = {12, 10,  2,  1}
+        expected = {12, 10, 2, 1}
         actual = set(indices[0])
         self.assertEqual(expected, actual)
 
@@ -99,7 +100,7 @@ class TestArticles(unittest.TestCase):
         self.assertEqual(0, norm(actual - expected))
 
         # check that actual indices match expected
-        expected = {12, 10,  2,  1}
+        expected = {12, 10, 2, 1}
         actual = set(indices[0])
         self.assertEqual(expected, actual)
 
@@ -118,7 +119,9 @@ class TestArticles(unittest.TestCase):
             "garment_group_no",
         ]
         expected = dummy_features(self.dataset.articles, features)
-        munger = articles.ArticleFeaturesSimpleFeatures(self.dataset.articles, use_article_id=True)
+        munger = articles.ArticleFeaturesSimpleFeatures(
+            self.dataset.articles, use_article_id=True
+        )
         actual = munger.x
         # test that columns are same
         self.assertEqual(list(expected.columns), list(actual.columns))

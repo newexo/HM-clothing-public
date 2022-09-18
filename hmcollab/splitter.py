@@ -34,6 +34,18 @@ def transactions_train_test(a_set, ids_tr, ids_te):
     return train, test
 
 
+def prune_customers(customers, customer_ids=None, transactions=None):
+    if transactions is not None:
+        customer_ids = transactions.customer_id.unique()
+    return customers.loc[customers.customer_id.isin(customer_ids), :]
+
+
+def prune_articles(articles, article_ids=None, transactions=None):
+    if transactions is not None:
+        article_ids = transactions.article_id.unique()
+    return articles.loc[articles.article_id.isin(article_ids), :]
+
+
 class Portion(metaclass=ABCMeta):
     def split(self, dataset):
         transactions = self._get_transaction_portion(dataset)
@@ -63,6 +75,15 @@ class NewerPortion(Portion):
         older, newer = split_by_time(dataset.transactions, self.days)
         return newer
 
+
+class StandardStrategy:
+    def __init__(self, dataset: ThreePartDataset, days):
+        self.newer_portion = NewerPortion(days)
+        self.older_portion = OlderPortion(days)
+
+        #
+        older = self.older_portion.split(dataset)
+        newer = self.older_portion.split(dataset)
 
 class CustomerPortion(Portion):
     def __init__(self, customer_ids):
@@ -143,15 +164,3 @@ class SplitByCustomerTrainTestValidationStrategy(SplitByCustomerStrategy):
     @property
     def validation(self):
         return self.partition[2]
-
-
-def prune_customers(customers, customer_ids=None, transactions=None):
-    if transactions is not None:
-        customer_ids = transactions.customer_id.unique()
-    return customers.loc[customers.customer_id.isin(customer_ids), :]
-
-
-def prune_articles(articles, article_ids=None, transactions=None):
-    if transactions is not None:
-        article_ids = transactions.article_id.unique()
-    return articles.loc[articles.article_id.isin(article_ids), :]

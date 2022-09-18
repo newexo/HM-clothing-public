@@ -1,5 +1,6 @@
 import unittest
 
+from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab import datasets
 from hmcollab import directories
 from hmcollab import articles
@@ -8,16 +9,13 @@ from hmcollab import scoring
 
 import warnings
 import pandas as pd
-import os
 
 warnings.filterwarnings("ignore")
 
 
 class TestModels(unittest.TestCase):
     def setUp(self):
-        self.tree = datasets.HMDatasetDirectoryTree(
-            base=directories.testdata("ten_customers")
-        )
+        self.tree = HMDatasetDirectoryTree(base=directories.testdata("ten_customers"))
         self.dataset = datasets.HMDataset(tree=self.tree)
         self.articles_munger = articles.ArticleFeaturesSimpleFeatures(
             self.dataset.articles, use_article_id=True
@@ -46,8 +44,8 @@ class TestModels(unittest.TestCase):
             groups=2,
             total_recommendations=6,
         )
-        print('\nregular')
-        print('groups', recommender.groups)
+        print("\nregular")
+        print("groups", recommender.groups)
         actual = recommender.recommend(self.customer)
 
         print(actual)
@@ -144,15 +142,17 @@ class TestModels(unittest.TestCase):
 
         # cwd = '/Users/gina/Desktop/Gina/MachineLearning/Proyectos/HM/HM-clothing-project'
         # y_by_customer = pd.read_csv(cwd+'/data/target_set_7d_75481u.csv')
-        y_by_customer = pd.read_csv(directories.data(filename='target_set_7d_75481u.csv'))
+        y_by_customer = pd.read_csv(
+            directories.data(filename="target_set_7d_75481u.csv")
+        )
 
         t = scoring.relevant(actual_recommend_all, y_by_customer)
-        print('\nRelevant:\n', t)
-        print('\nCustomers with transactions in the last 7 days:', t.shape)
-        print('\nCustomers with transactions in the last 7 days:', t[0].shape)
+        print("\nRelevant:\n", t)
+        print("\nCustomers with transactions in the last 7 days:", t.shape)
+        print("\nCustomers with transactions in the last 7 days:", t[0].shape)
 
-        print('precision_at_k:')
+        print("precision_at_k:")
         for i in range(len(t[0])):
             print(scoring.precision_at_k(t[0][: i + 1]))
-        print('ap_at_k:', scoring.ap_at_k(t[0]))
-        print('map_at_k:', scoring.map_at_k(t))
+        print("ap_at_k:", scoring.ap_at_k(t[0]))
+        print("map_at_k:", scoring.map_at_k(t))

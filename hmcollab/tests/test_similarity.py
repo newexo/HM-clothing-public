@@ -1,5 +1,6 @@
 import unittest
 
+from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab import datasets
 from hmcollab import directories
 from hmcollab.similarity import IdenticalSimilarity, DepartmentSimilarity
@@ -7,7 +8,7 @@ from hmcollab.similarity import IdenticalSimilarity, DepartmentSimilarity
 
 class TestSimilarity(unittest.TestCase):
     def setUp(self):
-        self.tree = datasets.HMDatasetDirectoryTree(base=directories.testdata())
+        self.tree = HMDatasetDirectoryTree(base=directories.testdata())
         self.dataset = datasets.HMDataset(tree=self.tree)
         self.id0 = "0110065001"
         self.id1 = "0111565001"
