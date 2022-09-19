@@ -62,56 +62,24 @@ def target_to_relevant(trans_y):
 
 
 class HMDataset(ThreePartDataset):
-    def __init__(self, tree=None, toy=False, folds="twosets"):
-        if tree is None:
-            tree = HMDatasetDirectoryTree()
-        self.tree = tree
-        articles = pd.read_csv(
-            self.tree.articles,
-            dtype={
-                "article_id": object,
-                "product_code": object,
-                "colour_group_code": object,
-            },
-        )
-        customers = pd.read_csv(self.tree.customers)
-
-        self.relevant_set = None
-        if toy:
-            transactions = pd.read_csv(
-                self.tree.toy,
-                dtype={
-                    "article_id": object,
-                },
-            )
-        else:
-            transactions = pd.read_csv(
-                self.tree.transactions,
-                dtype={
-                    "article_id": object,
-                },
-            )
-            if self.tree.transactions_y_by_customer_exists:
-                self.relevant_set = pd.read_csv(
-                    self.tree.transactions_y_by_customer,
-                    dtype={
-                        "article_id": object,
-                    },
-                )
-                (
-                    self.transactions_x,
-                    self.transactions_y,
-                ) = hmcollab.splitter.split_by_time(transactions, days=7)
+    def __init__(self, tree=None, articles=None, customers=None, transactions=None, relevant_set=None, toy=False, folds="twosets"):
+        if articles is None:
+            if tree is None:
+                tree = HMDatasetDirectoryTree()
+            self.tree = tree
+            articles, customers, transactions, relevant_set = tree.load(toy=toy)
 
         ThreePartDataset.__init__(self, articles, customers, transactions)
 
-        if self.relevant_set is None:
-            target = Target(self.transactions)
-            self.relevant_set = target.relevant_set
-            self.transactions_x, self.transactions_y = (
-                target.transactions_x,
-                target.transactions_y,
-            )
+        target = Target(self.transactions)
+        self.transactions_x, self.transactions_y = (
+            target.transactions_x,
+            target.transactions_y,
+        )
+
+        if relevant_set is None:
+            relevant_set = target.relevant_set
+        self.relevant_set = relevant_set
 
         if folds == "twosets":
             ids_train, ids_test = hmcollab.splitter.split_ids(

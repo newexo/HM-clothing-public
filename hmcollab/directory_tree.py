@@ -47,54 +47,53 @@ class HMDatasetDirectoryTree:
         dir = self.images(prefix)
         return os.path.join(dir, filename)
 
-    # def load_articles(self):
-    #     return pd.read_csv(
-    #         self.articles,
-    #         dtype={
-    #             "article_id": object,
-    #             "product_code": object,
-    #             "colour_group_code": object,
-    #         },
-    #     )
-    #
-    # def load_customers(self):
-    #     return pd.read_csv(self.customers)
-    #
-    # def load_transactions(self):
-    #     return
-    #
-    # def load_toy(self):
-    #     return pd.read_csv(
-    #         self.toy,
-    #         dtype={
-    #             "article_id": object,
-    #         },
-    #     )
-    #
-    # def load_relevant(self):
-    #
-    # def load(self, toy=False):
-    #     articles = self.load_articles()
-    #     customers = self.load_customers()
-    #
-    #     relevant_set = None
-    #     if toy:
-    #         transactions = self.load_toy()
-    #     else:
-    #         transactions = pd.read_csv(
-    #             self.tree.transactions,
-    #             dtype={
-    #                 "article_id": object,
-    #             },
-    #         )
-    #         if self.tree.transactions_y_by_customer_exists:
-    #             self.relevant_set = pd.read_csv(
-    #                 self.tree.transactions_y_by_customer,
-    #                 dtype={
-    #                     "article_id": object,
-    #                 },
-    #             )
-    #             (
-    #                 self.transactions_x,
-    #                 self.transactions_y,
-    #             ) = hmcollab.splitter.split_by_time(transactions, days=7)
+    def load_articles(self):
+        return pd.read_csv(
+            self.articles,
+            dtype={
+                "article_id": object,
+                "product_code": object,
+                "colour_group_code": object,
+            },
+        )
+
+    def load_customers(self):
+        return pd.read_csv(self.customers)
+
+    def load_transactions(self):
+        return pd.read_csv(
+            self.transactions,
+            dtype={
+                "article_id": object,
+            },
+        )
+
+    def load_toy(self):
+        return pd.read_csv(
+            self.toy,
+            dtype={
+                "article_id": object,
+            },
+        )
+
+    def load_relevant(self):
+        return pd.read_csv(
+            self.transactions_y_by_customer,
+            dtype={
+                "article_id": object,
+            },
+        )
+
+    def load(self, toy=False):
+        articles = self.load_articles()
+        customers = self.load_customers()
+
+        relevant_set = None
+        if toy:
+            transactions = self.load_toy()
+        else:
+            transactions = self.load_transactions()
+            if self.transactions_y_by_customer_exists:
+                relevant_set = self.load_relevant()
+
+        return articles, customers, transactions, relevant_set
