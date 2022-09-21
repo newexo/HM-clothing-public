@@ -17,7 +17,9 @@ class TestDatasets(unittest.TestCase):
             base=directories.testdata("forty_more_customers")
         )
         self.forty_dataset = datasets.HMDataset(tree=self.forty_tree)
-        self.larger_tree = HMDatasetDirectoryTree(base=directories.testdata("larger_dataset"))
+        self.larger_tree = HMDatasetDirectoryTree(
+            base=directories.testdata("larger_dataset")
+        )
 
     def tearDown(self):
         pass
@@ -261,7 +263,13 @@ class TestDatasets(unittest.TestCase):
         actual = ds.test_y.shape
         self.assertEqual(expected, actual)
 
-        expected = {'t_dat': datetime(2020, 9, 17), 'customer_id': '66e3610925f8bc7d984a5a0f5a90f12d39861b3e82c0e019fe12c7404a4c112e', 'article_id': '0912571001', 'price': 0.0304915254237288, 'sales_channel_id': 2}
+        expected = {
+            "t_dat": datetime(2020, 9, 17),
+            "customer_id": "66e3610925f8bc7d984a5a0f5a90f12d39861b3e82c0e019fe12c7404a4c112e",
+            "article_id": "0912571001",
+            "price": 0.0304915254237288,
+            "sales_channel_id": 2,
+        }
         actual = ds.test_y.iloc[20].to_dict()
         self.assertEqual(expected, actual)
 
@@ -269,7 +277,13 @@ class TestDatasets(unittest.TestCase):
         actual = ds.test_x.shape
         self.assertEqual(expected, actual)
 
-        expected = {'t_dat': datetime(2019, 5, 6), 'customer_id': 'f28be6450139dcff869b4a44e25c1d076cc322d280ea6b2ae0c85ff3240b21a2', 'article_id': '0611221010', 'price': 0.0169322033898305, 'sales_channel_id': 2}
+        expected = {
+            "t_dat": datetime(2019, 5, 6),
+            "customer_id": "f28be6450139dcff869b4a44e25c1d076cc322d280ea6b2ae0c85ff3240b21a2",
+            "article_id": "0611221010",
+            "price": 0.0169322033898305,
+            "sales_channel_id": 2,
+        }
         actual = ds.test_x.iloc[500].to_dict()
         self.assertEqual(expected, actual)
 
@@ -277,7 +291,13 @@ class TestDatasets(unittest.TestCase):
         actual = ds.train_y.shape
         self.assertEqual(expected, actual)
 
-        expected = {'t_dat': datetime(2020, 9, 18), 'customer_id': 'd9c7a5fb3d5ae128928b24e7c14a9560cce6033b71594ae153458fa42dd0f1ee', 'article_id': '0926502001', 'price': 0.0593050847457627, 'sales_channel_id': 2}
+        expected = {
+            "t_dat": datetime(2020, 9, 18),
+            "customer_id": "d9c7a5fb3d5ae128928b24e7c14a9560cce6033b71594ae153458fa42dd0f1ee",
+            "article_id": "0926502001",
+            "price": 0.0593050847457627,
+            "sales_channel_id": 2,
+        }
         actual = ds.train_y.iloc[50].to_dict()
         self.assertEqual(expected, actual)
 
@@ -285,7 +305,13 @@ class TestDatasets(unittest.TestCase):
         actual = ds.train_x.shape
         self.assertEqual(expected, actual)
 
-        expected = {'t_dat': datetime(2019, 1, 15), 'customer_id': 'ca3a7ff3f7d80394f7934e24328f12c1e9e313a338f0528e669420843bc37433', 'article_id': '0578133005', 'price': 0.0254067796610169, 'sales_channel_id': 2}
+        expected = {
+            "t_dat": datetime(2019, 1, 15),
+            "customer_id": "ca3a7ff3f7d80394f7934e24328f12c1e9e313a338f0528e669420843bc37433",
+            "article_id": "0578133005",
+            "price": 0.0254067796610169,
+            "sales_channel_id": 2,
+        }
         actual = ds.train_x.iloc[500].to_dict()
         self.assertEqual(expected, actual)
 
@@ -293,7 +319,13 @@ class TestDatasets(unittest.TestCase):
         actual = ds.val_y.shape
         self.assertEqual(expected, actual)
 
-        expected = {'t_dat': datetime(2020, 9, 19), 'customer_id': 'bb6dfa739c76d279be68c9d55745bf0dbe561c629d722901ca64c189584ebc54', 'article_id': '0923340001', 'price': 0.0169322033898305, 'sales_channel_id': 2}
+        expected = {
+            "t_dat": datetime(2020, 9, 19),
+            "customer_id": "bb6dfa739c76d279be68c9d55745bf0dbe561c629d722901ca64c189584ebc54",
+            "article_id": "0923340001",
+            "price": 0.0169322033898305,
+            "sales_channel_id": 2,
+        }
         actual = ds.val_y.iloc[50].to_dict()
         self.assertEqual(expected, actual)
 
@@ -301,7 +333,13 @@ class TestDatasets(unittest.TestCase):
         actual = ds.val_x.shape
         self.assertEqual(expected, actual)
 
-        expected = {'t_dat': datetime(2019, 5, 11), 'customer_id': '0650bd95fe9658f9afa9a21fe08823fa41de1fb11f6f819a655c16ef1ba51e7b', 'article_id': '0678687011', 'price': 0.0198135593220338, 'sales_channel_id': 1}
+        expected = {
+            "t_dat": datetime(2019, 5, 11),
+            "customer_id": "0650bd95fe9658f9afa9a21fe08823fa41de1fb11f6f819a655c16ef1ba51e7b",
+            "article_id": "0678687011",
+            "price": 0.0198135593220338,
+            "sales_channel_id": 1,
+        }
         actual = ds.val_x.iloc[200].to_dict()
         self.assertEqual(expected, actual)
 
@@ -311,7 +349,13 @@ class TestDatasets(unittest.TestCase):
         actual = ds.train_x.shape
         self.assertEqual(expected, actual)
 
-        expected = {'t_dat': datetime(2019, 6, 23), 'customer_id': '00007d2de826758b65a93dd24ce629ed66842531df6699338c5570910a014cc2', 'article_id': '0779136002', 'price': 0.0338813559322033, 'sales_channel_id': 2}
+        expected = {
+            "t_dat": datetime(2019, 6, 23),
+            "customer_id": "00007d2de826758b65a93dd24ce629ed66842531df6699338c5570910a014cc2",
+            "article_id": "0779136002",
+            "price": 0.0338813559322033,
+            "sales_channel_id": 2,
+        }
         actual = ds.train_x.iloc[2000].to_dict()
         self.assertEqual(expected, actual)
 
@@ -319,7 +363,13 @@ class TestDatasets(unittest.TestCase):
         actual = ds.train_y.shape
         self.assertEqual(expected, actual)
 
-        expected = {'t_dat': datetime(2020, 9, 18), 'customer_id': '35fcf8a13f6c4f462ddbe48bbac995572e268dfa15b714253369400df7d849f5', 'article_id': '0868134003', 'price': 0.0677796610169491, 'sales_channel_id': 2}
+        expected = {
+            "t_dat": datetime(2020, 9, 18),
+            "customer_id": "35fcf8a13f6c4f462ddbe48bbac995572e268dfa15b714253369400df7d849f5",
+            "article_id": "0868134003",
+            "price": 0.0677796610169491,
+            "sales_channel_id": 2,
+        }
         actual = ds.train_y.iloc[100].to_dict()
         self.assertEqual(expected, actual)
 
@@ -327,6 +377,12 @@ class TestDatasets(unittest.TestCase):
         actual = ds.train_vy.shape
         self.assertEqual(expected, actual)
 
-        expected = {'t_dat': datetime(2020, 9, 12), 'customer_id': '810e118a57af940013ed82c7f61a885f78b00f7cbd08b96e3150004311bc2b0a', 'article_id': '0809238001', 'price': 0.0423559322033898, 'sales_channel_id': 2}
+        expected = {
+            "t_dat": datetime(2020, 9, 12),
+            "customer_id": "810e118a57af940013ed82c7f61a885f78b00f7cbd08b96e3150004311bc2b0a",
+            "article_id": "0809238001",
+            "price": 0.0423559322033898,
+            "sales_channel_id": 2,
+        }
         actual = ds.train_vy.iloc[50].to_dict()
         self.assertEqual(expected, actual)

@@ -85,6 +85,7 @@ class StandardStrategy:
         older = self.older_portion.split(dataset)
         newer = self.older_portion.split(dataset)
 
+
 class CustomerPortion(Portion):
     def __init__(self, customer_ids):
         self.customer_ids = customer_ids
