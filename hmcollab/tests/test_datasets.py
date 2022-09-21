@@ -1,6 +1,7 @@
 import unittest
 import os
 import pandas as pd
+from datetime import datetime
 
 from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab import datasets
@@ -12,10 +13,11 @@ class TestDatasets(unittest.TestCase):
         self.tree = HMDatasetDirectoryTree(base=directories.testdata())
         self.dataset = datasets.HMDataset(tree=self.tree)
         self.x_y_r = datasets.Target(self.dataset.transactions)
-        self.larger_tree = HMDatasetDirectoryTree(
+        self.forty_tree = HMDatasetDirectoryTree(
             base=directories.testdata("forty_more_customers")
         )
-        self.larger_dataset = datasets.HMDataset(tree=self.larger_tree)
+        self.forty_dataset = datasets.HMDataset(tree=self.forty_tree)
+        self.larger_tree = HMDatasetDirectoryTree(base=directories.testdata("larger_dataset"))
 
     def tearDown(self):
         pass
@@ -176,21 +178,21 @@ class TestDatasets(unittest.TestCase):
         actual = list(self.dataset.relevant_set.target)
         self.assertEqual(expected, actual)
 
-    def test_larger_relevant(self):
+    def test_forty_more_relevant(self):
         expected = ["customer_id", "target"]
-        actual = list(self.larger_dataset.relevant_set.columns)
+        actual = list(self.forty_dataset.relevant_set.columns)
         self.assertEqual(expected, actual)
 
-        expected = set(self.larger_dataset.transactions_y.customer_id.unique())
-        actual = set(self.larger_dataset.relevant_set.customer_id.unique())
+        expected = set(self.forty_dataset.transactions_y.customer_id.unique())
+        actual = set(self.forty_dataset.relevant_set.customer_id.unique())
         self.assertEqual(expected, actual)
 
         expected = ["0794321007", "0806050001 0826505003 0921671001 0918516001"]
-        actual = list(self.larger_dataset.relevant_set.target)
+        actual = list(self.forty_dataset.relevant_set.target)
         self.assertEqual(expected, actual)
 
     def test_toy(self):
-        dataset = datasets.HMDataset(tree=self.larger_tree, toy=True)
+        dataset = datasets.HMDataset(tree=self.forty_tree, toy=True)
         expected = (120, 5)
         actual = dataset.transactions.shape
         self.assertEqual(expected, actual)
@@ -206,41 +208,102 @@ class TestDatasets(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
-    def test_larger(self):
+    def test_forty_more(self):
         expected = (53, 7)
-        actual = self.larger_dataset.customers.shape
+        actual = self.forty_dataset.customers.shape
         self.assertEqual(expected, actual)
 
         expected = (1223, 25)
-        actual = self.larger_dataset.articles.shape
+        actual = self.forty_dataset.articles.shape
         self.assertEqual(expected, actual)
 
         expected = (1557, 5)
-        actual = self.larger_dataset.transactions.shape
+        actual = self.forty_dataset.transactions.shape
         self.assertEqual(expected, actual)
 
         expected = (1552, 5)
-        actual = self.larger_dataset.transactions_x.shape
+        actual = self.forty_dataset.transactions_x.shape
         self.assertEqual(expected, actual)
 
         expected = (5, 5)
-        actual = self.larger_dataset.transactions_y.shape
+        actual = self.forty_dataset.transactions_y.shape
         self.assertEqual(expected, actual)
 
         expected = (1378, 5)
-        actual = self.larger_dataset.train_x.shape
+        actual = self.forty_dataset.train_x.shape
         self.assertEqual(expected, actual)
 
         expected = (5, 5)
-        actual = self.larger_dataset.train_y.shape
+        actual = self.forty_dataset.train_y.shape
         self.assertEqual(expected, actual)
 
     def test_twosets(self):
-        ds = datasets.HMDataset(tree=self.tree, folds="twosets")
-        self.fail("incomplete")
+        ds = datasets.HMDataset(tree=self.larger_tree, folds="twosets")
+        expected = (46, 5)
+        actual = ds.test_y.shape
+        self.assertEqual(expected, actual)
+
+        expected = (1366, 5)
+        actual = ds.test_x.shape
+        self.assertEqual(expected, actual)
+
+        expected = (195, 5)
+        actual = ds.train_y.shape
+        self.assertEqual(expected, actual)
+
+        expected = (3498, 5)
+        actual = ds.train_x.shape
+        self.assertEqual(expected, actual)
 
     def test_threesets(self):
-        self.fail("incomplete")
+        ds = datasets.HMDataset(tree=self.larger_tree, folds="threesets")
+        expected = (46, 5)
+        actual = ds.test_y.shape
+        self.assertEqual(expected, actual)
+
+        expected = {'t_dat': datetime(2020, 9, 17), 'customer_id': '66e3610925f8bc7d984a5a0f5a90f12d39861b3e82c0e019fe12c7404a4c112e', 'article_id': '0912571001', 'price': 0.0304915254237288, 'sales_channel_id': 2}
+        actual = ds.test_y.iloc[20].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (1366, 5)
+        actual = ds.test_x.shape
+        self.assertEqual(expected, actual)
+
+        expected = {'t_dat': datetime(2019, 5, 6), 'customer_id': 'f28be6450139dcff869b4a44e25c1d076cc322d280ea6b2ae0c85ff3240b21a2', 'article_id': '0611221010', 'price': 0.0169322033898305, 'sales_channel_id': 2}
+        actual = ds.test_x.iloc[500].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (110, 5)
+        actual = ds.train_y.shape
+        self.assertEqual(expected, actual)
+
+        expected = {'t_dat': datetime(2020, 9, 18), 'customer_id': 'd9c7a5fb3d5ae128928b24e7c14a9560cce6033b71594ae153458fa42dd0f1ee', 'article_id': '0926502001', 'price': 0.0593050847457627, 'sales_channel_id': 2}
+        actual = ds.train_y.iloc[50].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (2724, 5)
+        actual = ds.train_x.shape
+        self.assertEqual(expected, actual)
+
+        expected = {'t_dat': datetime(2019, 1, 15), 'customer_id': 'ca3a7ff3f7d80394f7934e24328f12c1e9e313a338f0528e669420843bc37433', 'article_id': '0578133005', 'price': 0.0254067796610169, 'sales_channel_id': 2}
+        actual = ds.train_x.iloc[500].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (74, 5)
+        actual = ds.val_y.shape
+        self.assertEqual(expected, actual)
+
+        expected = {'t_dat': datetime(2020, 9, 19), 'customer_id': 'bb6dfa739c76d279be68c9d55745bf0dbe561c629d722901ca64c189584ebc54', 'article_id': '0923340001', 'price': 0.0169322033898305, 'sales_channel_id': 2}
+        actual = ds.val_y.iloc[50].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (774, 5)
+        actual = ds.val_x.shape
+        self.assertEqual(expected, actual)
+
+        expected = {'t_dat': datetime(2019, 5, 11), 'customer_id': '0650bd95fe9658f9afa9a21fe08823fa41de1fb11f6f819a655c16ef1ba51e7b', 'article_id': '0678687011', 'price': 0.0198135593220338, 'sales_channel_id': 1}
+        actual = ds.val_x.iloc[200].to_dict()
+        self.assertEqual(expected, actual)
 
     def test_standard(self):
         self.fail("incomplete")
