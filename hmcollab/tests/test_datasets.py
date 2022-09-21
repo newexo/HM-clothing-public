@@ -306,4 +306,27 @@ class TestDatasets(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_standard(self):
-        self.fail("incomplete")
+        ds = datasets.HMDataset(tree=self.larger_tree, folds="standard")
+        expected = (4776, 5)
+        actual = ds.train_x.shape
+        self.assertEqual(expected, actual)
+
+        expected = {'t_dat': datetime(2019, 6, 23), 'customer_id': '00007d2de826758b65a93dd24ce629ed66842531df6699338c5570910a014cc2', 'article_id': '0779136002', 'price': 0.0338813559322033, 'sales_channel_id': 2}
+        actual = ds.train_x.iloc[2000].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (241, 5)
+        actual = ds.train_y.shape
+        self.assertEqual(expected, actual)
+
+        expected = {'t_dat': datetime(2020, 9, 18), 'customer_id': '35fcf8a13f6c4f462ddbe48bbac995572e268dfa15b714253369400df7d849f5', 'article_id': '0868134003', 'price': 0.0677796610169491, 'sales_channel_id': 2}
+        actual = ds.train_y.iloc[100].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (88, 5)
+        actual = ds.train_vy.shape
+        self.assertEqual(expected, actual)
+
+        expected = {'t_dat': datetime(2020, 9, 12), 'customer_id': '810e118a57af940013ed82c7f61a885f78b00f7cbd08b96e3150004311bc2b0a', 'article_id': '0809238001', 'price': 0.0423559322033898, 'sales_channel_id': 2}
+        actual = ds.train_vy.iloc[50].to_dict()
+        self.assertEqual(expected, actual)
