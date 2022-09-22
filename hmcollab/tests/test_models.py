@@ -66,7 +66,7 @@ class TestModels(unittest.TestCase):
     #         groups=4,
     #         total_recommendations=6,
     #     )
-    #     actual = recommender.recommend(self.customer)
+    #     actual = recommender.recommend(self.customer, drop_duplicates=False)
     #     expected = ['0735843004', '0559630026', '0726925001', '0599580055']
     #     self.assertEqual(expected, actual)
 
@@ -77,7 +77,7 @@ class TestModels(unittest.TestCase):
             groups=2,
             total_recommendations=4,
         )
-        df = recommender.recommend_all(self.customer_list)
+        df = recommender.recommend_all(self.customer_list, drop_duplicates=False)
 
         actual = df.shape
         expected = (2, 2)
@@ -90,6 +90,32 @@ class TestModels(unittest.TestCase):
         actual = df.prediction[0]
 
         expected = "0351484002 0663713001 0870304002 0578020002"
+        self.assertEqual(expected, actual)
+
+        actual = df.prediction[1]
+        expected = "0715624008 0783388001 0726925001 0735843004"
+        self.assertEqual(expected, actual)
+
+    def test_recommend_all_drop_duplicates(self):
+        recommender = models.KnnRecommender(
+            self.dataset,
+            self.full_dummies,
+            groups=2,
+            total_recommendations=4,
+        )
+        df = recommender.recommend_all(self.customer_list, drop_duplicates=True)
+
+        actual = df.shape
+        expected = (2, 2)
+        self.assertEqual(expected, actual)
+
+        actual = len(df.prediction[0].split(" "))
+        expected = 4
+        self.assertEqual(expected, actual)
+
+        actual = df.prediction[0]
+
+        expected = "0727808001 0852643001 0578020002 0750424014"
         self.assertEqual(expected, actual)
 
         actual = df.prediction[1]

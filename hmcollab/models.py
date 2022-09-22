@@ -52,10 +52,11 @@ class KnnRecommender:
             self.simple_munger, k=self.recomendations_by_group
         )
 
-    def recommend(self, customer):
+    def recommend(self, customer, drop_duplicates=True):
         recomendation_ids = []
         customer_dummies = self.t.customer_dummies(customer, self.full_article_dummies)
-        customer_dummies = customer_dummies.drop_duplicates()
+        if drop_duplicates:
+            customer_dummies = customer_dummies.drop_duplicates()
         min_k = self.groups
         if customer_dummies.shape[0] < self.groups:
             min_k = customer_dummies.shape[0]   # so far it will produce less recommendations for this customer
@@ -68,10 +69,10 @@ class KnnRecommender:
                 recomendation_ids.append(article_id)
         return recomendation_ids
 
-    def recommend_all(self, customer_list):
+    def recommend_all(self, customer_list, drop_duplicates=True):
         df = pd.DataFrame(columns=["prediction"], index=customer_list)
         for c in customer_list:
-            recommendations = self.recommend(c)
+            recommendations = self.recommend(c, drop_duplicates=drop_duplicates)
             df.loc[c] = {"prediction": " ".join(recommendations)}
         df = df.reset_index().rename(columns={"index": "customer_id"})
         return df
