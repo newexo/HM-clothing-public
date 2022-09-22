@@ -55,10 +55,9 @@ class KnnRecommender:
     def recommend(self, customer):
         recomendation_ids = []
         customer_dummies = self.t.customer_dummies(customer, self.full_article_dummies)
+        customer_dummies = customer_dummies.drop_duplicates()
         min_k = self.groups
-        print('customer_dummies', customer_dummies.shape[0])
         if customer_dummies.shape[0] < self.groups:
-            print('Customer with few obs: ', customer)
             min_k = customer_dummies.shape[0]   # so far it will produce less recommendations for this customer
         all_groups = transactions.kmeans_consumer(customer_dummies, k=min_k)
         for i in range(min_k):
