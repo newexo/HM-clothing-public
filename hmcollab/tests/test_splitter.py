@@ -15,6 +15,10 @@ class TestSplitter(unittest.TestCase):
             base=directories.testdata("forty_more_customers")
         )
         self.dataset = datasets.HMDataset(tree=self.tree)
+        self.larger_tree = HMDatasetDirectoryTree(
+            base=directories.testdata("larger_dataset")
+        )
+        self.larger_dataset = datasets.HMDataset(tree=self.larger_tree)
 
     def tearDown(self):
         pass
@@ -352,4 +356,49 @@ class TestSplitter(unittest.TestCase):
             "309de68e2003d3944ce891fa38f1f7b190522eb6b63146a0bff941fb8b339be5",
             "9bf81bb97882f398974e2d0190d253f6eb218f3c2103ab30d290d36a078d1b75",
         }
+        self.assertEqual(expected, actual)
+
+    def test_standard_strategy(self):
+        strategy = splitter.StandardStrategy(self.larger_dataset, 7)
+
+        expected = (4776, 5)
+        actual = strategy.x.transactions.shape
+        self.assertEqual(expected, actual)
+
+        expected = {
+            "t_dat": datetime.datetime(2019, 6, 23),
+            "customer_id": "00007d2de826758b65a93dd24ce629ed66842531df6699338c5570910a014cc2",
+            "article_id": "0779136002",
+            "price": 0.0338813559322033,
+            "sales_channel_id": 2,
+        }
+        actual = strategy.x.transactions.iloc[2000].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (241, 5)
+        actual = strategy.y.transactions.shape
+        self.assertEqual(expected, actual)
+
+        expected = {
+            "t_dat": datetime.datetime(2020, 9, 18),
+            "customer_id": "35fcf8a13f6c4f462ddbe48bbac995572e268dfa15b714253369400df7d849f5",
+            "article_id": "0868134003",
+            "price": 0.0677796610169491,
+            "sales_channel_id": 2,
+        }
+        actual = strategy.y.transactions.iloc[100].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (88, 5)
+        actual = strategy.vy.transactions.shape
+        self.assertEqual(expected, actual)
+
+        expected = {
+            "t_dat": datetime.datetime(2020, 9, 12),
+            "customer_id": "810e118a57af940013ed82c7f61a885f78b00f7cbd08b96e3150004311bc2b0a",
+            "article_id": "0809238001",
+            "price": 0.0423559322033898,
+            "sales_channel_id": 2,
+        }
+        actual = strategy.vy.transactions.iloc[50].to_dict()
         self.assertEqual(expected, actual)

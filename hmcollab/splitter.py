@@ -81,9 +81,23 @@ class StandardStrategy:
         self.newer_portion = NewerPortion(days)
         self.older_portion = OlderPortion(days)
 
-        #
         older = self.older_portion.split(dataset)
-        newer = self.older_portion.split(dataset)
+        newer = self.newer_portion.split(dataset)
+        oldest = self.older_portion.split(older)
+        middle = self.newer_portion.split(older)
+        self.partition = [oldest, middle, newer]
+
+    @property
+    def x(self):
+        return self.partition[0]
+
+    @property
+    def vy(self):
+        return self.partition[1]
+
+    @property
+    def y(self):
+        return self.partition[2]
 
 
 class CustomerPortion(Portion):
