@@ -76,10 +76,32 @@ class NewerPortion(Portion):
         return newer
 
 
-class StandardStrategy:
-    def __init__(self, dataset: ThreePartDataset, days):
+class TimeSplitStrategy:
+    def __init__(self, days):
         self.newer_portion = NewerPortion(days)
         self.older_portion = OlderPortion(days)
+
+
+class XYStrategy(TimeSplitStrategy):
+    def __init__(self, dataset: ThreePartDataset, days):
+        super().__init__(days)
+
+        older = self.older_portion.split(dataset)
+        newer = self.newer_portion.split(dataset)
+        self.partition = [older, newer]
+
+    @property
+    def x(self):
+        return self.partition[0]
+
+    @property
+    def y(self):
+        return self.partition[1]
+
+
+class StandardStrategy(TimeSplitStrategy):
+    def __init__(self, dataset: ThreePartDataset, days):
+        super().__init__(days)
 
         older = self.older_portion.split(dataset)
         newer = self.newer_portion.split(dataset)

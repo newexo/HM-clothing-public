@@ -358,6 +358,37 @@ class TestSplitter(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
+    def test_xy_strategy(self):
+        strategy = splitter.XYStrategy(self.larger_dataset, 7)
+
+        expected = (4864, 5)
+        actual = strategy.x.transactions.shape
+        self.assertEqual(expected, actual)
+
+        expected = {
+            "t_dat": datetime.datetime(2019, 6, 23),
+            "customer_id": "00007d2de826758b65a93dd24ce629ed66842531df6699338c5570910a014cc2",
+            "article_id": "0779136002",
+            "price": 0.0338813559322033,
+            "sales_channel_id": 2,
+        }
+        actual = strategy.x.transactions.iloc[2000].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (241, 5)
+        actual = strategy.y.transactions.shape
+        self.assertEqual(expected, actual)
+
+        expected = {
+            "t_dat": datetime.datetime(2020, 9, 18),
+            "customer_id": "35fcf8a13f6c4f462ddbe48bbac995572e268dfa15b714253369400df7d849f5",
+            "article_id": "0868134003",
+            "price": 0.0677796610169491,
+            "sales_channel_id": 2,
+        }
+        actual = strategy.y.transactions.iloc[100].to_dict()
+        self.assertEqual(expected, actual)
+
     def test_standard_strategy(self):
         strategy = splitter.StandardStrategy(self.larger_dataset, 7)
 

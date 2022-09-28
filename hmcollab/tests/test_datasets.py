@@ -257,6 +257,37 @@ class TestDatasets(unittest.TestCase):
         actual = ds.train_x.shape
         self.assertEqual(expected, actual)
 
+    def test_x_y(self):
+        ds = datasets.HMDataset(tree=self.larger_tree, folds="twosets")
+
+        expected = (4864, 5)
+        actual = ds.transactions_x.shape
+        self.assertEqual(expected, actual)
+
+        expected = {
+            "t_dat": datetime(2019, 6, 23),
+            "customer_id": "00007d2de826758b65a93dd24ce629ed66842531df6699338c5570910a014cc2",
+            "article_id": "0779136002",
+            "price": 0.0338813559322033,
+            "sales_channel_id": 2,
+        }
+        actual = ds.transactions_x.iloc[2000].to_dict()
+        self.assertEqual(expected, actual)
+
+        expected = (241, 5)
+        actual = ds.transactions_y.shape
+        self.assertEqual(expected, actual)
+
+        expected = {
+            "t_dat": datetime(2020, 9, 18),
+            "customer_id": "35fcf8a13f6c4f462ddbe48bbac995572e268dfa15b714253369400df7d849f5",
+            "article_id": "0868134003",
+            "price": 0.0677796610169491,
+            "sales_channel_id": 2,
+        }
+        actual = ds.transactions_y.iloc[100].to_dict()
+        self.assertEqual(expected, actual)
+
     def test_threesets(self):
         ds = datasets.HMDataset(tree=self.larger_tree, folds="threesets")
         expected = (46, 5)
