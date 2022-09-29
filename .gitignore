@@ -136,7 +136,7 @@ data/*.csv
 data/images
 
 # ignore folder for Gina
-gina/*.*
+gina/
 
 # ignore MacOS generated files
 .DS_Store
