@@ -5,7 +5,11 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-from hmcollab.three_part_dataset import ThreePartDataset
+from hmcollab.three_part_dataset import (
+    ThreePartDataset,
+    prune_customers,
+    prune_articles,
+)
 
 
 def split_by_time(df, days):
@@ -32,18 +36,6 @@ def transactions_train_test(a_set, ids_tr, ids_te):
     train = a_set.loc[a_set.customer_id.isin(ids_tr), :]
     test = a_set.loc[a_set.customer_id.isin(ids_te), :]
     return train, test
-
-
-def prune_customers(customers, customer_ids=None, transactions=None):
-    if transactions is not None:
-        customer_ids = transactions.customer_id.unique()
-    return customers.loc[customers.customer_id.isin(customer_ids), :]
-
-
-def prune_articles(articles, article_ids=None, transactions=None):
-    if transactions is not None:
-        article_ids = transactions.article_id.unique()
-    return articles.loc[articles.article_id.isin(article_ids), :]
 
 
 class Portion(metaclass=ABCMeta):

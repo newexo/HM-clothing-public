@@ -3,6 +3,7 @@ import unittest
 import datetime
 import numpy as np
 
+from hmcollab.three_part_dataset import prune_articles, prune_customers
 from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab import datasets
 from hmcollab import directories
@@ -73,7 +74,7 @@ class TestSplitter(unittest.TestCase):
             "00005ca1c9ed5f5146b52ac8639a40ca9d57aeff4d1bd2c5feb1ca5dff07c43e",
             "d3b658f59ad9bbf6249a7bf0db722f2f43cc47803d03299a3feb24487f1b6fbe",
         }
-        pruned_customers = splitter.prune_customers(
+        pruned_customers = prune_customers(
             self.dataset.customers, customer_ids=customer_ids
         )
         expected = customer_ids
@@ -87,7 +88,7 @@ class TestSplitter(unittest.TestCase):
             "0768847001",
             "0568601043",
         }
-        pruned_articles = splitter.prune_articles(
+        pruned_articles = prune_articles(
             self.dataset.articles, article_ids=article_ids
         )
         expected = article_ids

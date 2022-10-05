@@ -62,14 +62,24 @@ def target_to_relevant(trans_y):
 
 
 class HMDataset(ThreePartDataset):
-    def __init__(self, tree=None, articles=None, customers=None, transactions=None, relevant_set=None, toy=False, folds="twosets"):
+    def __init__(
+        self,
+        tree=None,
+        articles=None,
+        customers=None,
+        transactions=None,
+        relevant_set=None,
+        toy=False,
+        folds="twosets",
+        prune=False,
+    ):
         if articles is None:
             if tree is None:
                 tree = HMDatasetDirectoryTree()
             self.tree = tree
             articles, customers, transactions, relevant_set = tree.load(toy=toy)
 
-        ThreePartDataset.__init__(self, articles, customers, transactions)
+        ThreePartDataset.__init__(self, articles, customers, transactions, prune=prune)
 
         target = Target(self.transactions)
         self.transactions_x, self.transactions_y = (

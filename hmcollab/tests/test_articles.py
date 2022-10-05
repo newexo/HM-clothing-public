@@ -4,7 +4,7 @@ import numpy as np
 from numpy.linalg import norm
 import pandas as pd
 
-from hmcollab.directory_tree import HMDatasetDirectoryTree
+from hmcollab.directory_tree import HMDatasetDirectoryTree, read_with_article_id
 from hmcollab import articles
 from hmcollab import datasets
 from hmcollab import directories
@@ -20,6 +20,11 @@ class TestArticles(unittest.TestCase):
         self.tree = HMDatasetDirectoryTree(base=directories.testdata())
         self.dataset = datasets.HMDataset(tree=self.tree)
         self.simple_onehot = np.load(directories.testdata("simple_onehot.npy"))
+        one_of_each_dir = directories.testdata("one_of_each")
+        self.one_of_each_dummies = read_with_article_id(
+            directories.qualifyname(one_of_each_dir, "one_of_each_dummies.csv")
+        )
+        self.one_of_each_dataset = datasets.HMDataset(tree=HMDatasetDirectoryTree(one_of_each_dir))
 
     def tearDown(self):
         pass
@@ -131,3 +136,12 @@ class TestArticles(unittest.TestCase):
 
         # test article ids are same
         self.assertEqual(list(expected.article_id), list(actual.article_id))
+
+    def test_one_of_each(self):
+        # test load dataframe where each dummy has at least one non-zero entry
+        munger = articles.ArticleFeaturesSimpleFeatures(self.one_of_each_dataset.articles, use_article_id=True)
+        self.assertEqual(self.one_of_each_dummies.shape[1], munger.x.shape[1])
+        for index, expected in self.one_of_each_dummies.iterrows():
+            article_id = expected.article_id
+            actual = munger.x[munger.x.article_id == article_id].iloc[0]
+            self.assertEqual(expected.to_dict(), actual.to_dict(), msg="{} {}".format(index, article_id))

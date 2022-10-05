@@ -4,6 +4,15 @@ import pandas as pd
 from hmcollab import directories
 
 
+def read_with_article_id(filename):
+    return pd.read_csv(
+        filename,
+        dtype={
+            "article_id": object,
+        },
+    )
+
+
 class HMDatasetDirectoryTree:
     def __init__(self, base=None):
         if base is None:
@@ -61,28 +70,13 @@ class HMDatasetDirectoryTree:
         return pd.read_csv(self.customers)
 
     def load_transactions(self):
-        return pd.read_csv(
-            self.transactions,
-            dtype={
-                "article_id": object,
-            },
-        )
+        return read_with_article_id(self.transactions)
 
     def load_toy(self):
-        return pd.read_csv(
-            self.toy,
-            dtype={
-                "article_id": object,
-            },
-        )
+        return read_with_article_id(self.toy)
 
     def load_relevant(self):
-        return pd.read_csv(
-            self.transactions_y_by_customer,
-            dtype={
-                "article_id": object,
-            },
-        )
+        return read_with_article_id(self.transactions_y_by_customer)
 
     def load(self, toy=False):
         articles = self.load_articles()
