@@ -1,6 +1,8 @@
 # HM-clothing-project
 Python resources for the HM-clothing-project
 
+Data is from [Kaggle contest](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations).
+
 So far we implementend two different recommending models:
 + Popular 
   + top k articles in the dataset in term of transactions
