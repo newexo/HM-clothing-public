@@ -11,7 +11,7 @@ class TransactionsByCustomer:
 
     def customer_dummies(self, customer, full_articles_dummy):
         basket = self.all_article_ids(customer)
-        return full_articles_dummy.merge(basket, on="article_id", how="right").drop(
+        return full_articles_dummy.merge(basket, on="article_id", how="inner").drop(
             columns="article_id"
         )
 
