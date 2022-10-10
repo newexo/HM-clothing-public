@@ -98,7 +98,7 @@ class KnnRecommender_new:
         self.full_article_dummies = full_article_dummies
         self.groups = groups
         self.total_recommendations = total_recommendations
-        self.t = transactions.TransactionsByCustomer(self.dataset.train_x)
+        self.t = transactions.TransactionsByCustomer_new(self.dataset.train_x)
         # self.t = transactions.TransactionsByCustomer(self.dataset.transactions_x)
         filtered_art_ids = filter_articles(self.dataset.train_x, threshold=threshold)
         self.filtered_dummies = full_article_dummies[full_article_dummies.article_id.isin(
