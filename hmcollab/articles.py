@@ -51,18 +51,6 @@ class ArticleFeaturesSimpleFeatures(ArticleFeatureMunger):
 
 
 
-def filter_articles_a(trans_df, threshold=50):
-    # Compute the number of transactions by article_id. A good threshold for toy is 50, and 300 for full dataset
-    # returns:
-    #    filtered_article_id: list
-    freqs_df = trans_df.groupby(by=['article_id'], as_index=False).size()
-    freqs_df.reset_index(inplace=True)
-    freqs_df.drop(columns=['index'], inplace=True)
-    freqs_df.rename(columns={'size':'transactions'}, inplace=True)
-    filtered_article_id = freqs_df.loc[freqs_df.transactions>threshold, 'article_id'].to_list()
-    return filtered_article_id
-
-
 class ArticleKNN_new:
     def __init__(self, dummies, k=20):
         self.k = k
