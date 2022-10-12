@@ -1,14 +1,13 @@
 import math
 import pandas as pd
+from sklearn.neighbors import NearestNeighbors
 
 from hmcollab import articles
 from hmcollab import transactions
 
 
 class PopularRecommender:
-    def __init__(
-        self, dataset, full_article_dummies, total_recommendations=12
-    ):
+    def __init__(self, dataset, full_article_dummies, total_recommendations=12):
         self.dataset = dataset
         self.full_article_dummies = full_article_dummies
         self.total_recommendations = total_recommendations
@@ -20,16 +19,47 @@ class PopularRecommender:
     def recommend(self):
         """Return a list of article_ids with the most transactions.
         It will provide the same recommendation for all customers (old and new)"""
-        top_df = self.transactions.groupby(['article_id'], as_index=False).size()
-        top_df.sort_values(by=['size'], ascending=False, inplace=True)
-        return top_df.article_id[:self.total_recommendations].values.tolist()
-
+        top_df = self.transactions.groupby(["article_id"], as_index=False).size()
+        top_df.sort_values(by=["size"], ascending=False, inplace=True)
+        return top_df.article_id[: self.total_recommendations].values.tolist()
 
     def recommend_all(self, customer_list):
         df = pd.DataFrame(columns=["prediction"], index=customer_list)
-        df['prediction'] = " ".join(self.recommend())
+        df["prediction"] = " ".join(self.recommend())
         df = df.reset_index().rename(columns={"index": "customer_id"})
         return df
+
+
+class ArticleKNN:
+    def __init__(self, dummies, k=20):
+        self.k = k
+        if "article_id" in dummies.columns:
+            dummies = dummies.drop(columns=["article_id"])
+        self.model = NearestNeighbors(n_neighbors=k).fit(dummies.values)
+
+    def nearest(self, row=None):
+        row = row.reshape((1, -1))
+
+        return self.model.kneighbors(row)
+
+
+class ArticleKNN_new:
+    def __init__(self, dummies, k=20):
+        self.k = k
+        # self.a = articles
+        self.model = NearestNeighbors(n_neighbors=k).fit(dummies.values)
+
+    def nearest(self, index=None, id=None, row=None):
+        # if id is not None:
+        #     matches = self.a.df[self.a.df.article_id == id].index
+        #     index = matches[0]
+        #
+        # if index is not None:
+        #     row = self.a.x.values[index]
+
+        row = row.reshape((1, -1))
+
+        return self.model.kneighbors(row)
 
 
 class KnnRecommender:
@@ -41,16 +71,15 @@ class KnnRecommender:
         self.groups = groups
         self.total_recommendations = total_recommendations
         self.t = transactions.TransactionsByCustomer(self.dataset.train_x)
-        # self.t = transactions.TransactionsByCustomer(self.dataset.transactions_x)
-        self.simple_munger = articles.ArticleFeaturesSimpleFeatures(
-            self.dataset.articles
-        )
         self.recomendations_by_group = math.ceil(
             self.total_recommendations / self.groups
         )
-        self.model = articles.ArticleKNN(
-            self.simple_munger, k=self.recomendations_by_group
+        self.model = ArticleKNN(
+            self.full_article_dummies, k=self.recomendations_by_group
         )
+
+    def article_id_from_index(self, i):
+        return self.full_article_dummies.iloc[i].article_id
 
     def recommend(self, customer, drop_duplicates=True):
         recomendation_ids = []
@@ -59,13 +88,15 @@ class KnnRecommender:
             customer_dummies = customer_dummies.drop_duplicates()
         min_k = self.groups
         if customer_dummies.shape[0] < self.groups:
-            min_k = customer_dummies.shape[0]   # so far it will produce less recommendations for this customer
+            min_k = customer_dummies.shape[
+                0
+            ]  # so far it will produce fewer recommendations for this customer
         all_groups = transactions.kmeans_consumer(customer_dummies, k=min_k)
         for i in range(min_k):
             one_group = all_groups.cluster_centers_[i]
             _, indices = self.model.nearest(row=one_group)
             for r in indices[0][: self.recomendations_by_group]:
-                article_id = self.simple_munger.id_from_index(r)
+                article_id = self.article_id_from_index(r)
                 recomendation_ids.append(article_id)
         return recomendation_ids
 
@@ -111,7 +142,7 @@ class KnnRecommender_new:
         self.recomendations_by_group = math.ceil(
             self.total_recommendations / self.groups
         )
-        self.model = articles.ArticleKNN_new(
+        self.model = ArticleKNN_new(
             self.filtered_dummies, k=self.recomendations_by_group
         )
 

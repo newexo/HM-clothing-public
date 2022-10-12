@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
 import pandas as pd
-from sklearn.neighbors import NearestNeighbors
 
 
 class ArticleMunger(metaclass=ABCMeta):
@@ -19,7 +18,6 @@ class ArticleMunger(metaclass=ABCMeta):
 
 
 class ArticleFeatureMunger(ArticleMunger, metaclass=ABCMeta):
-
     @abstractmethod
     def features(self):
         pass
@@ -27,12 +25,13 @@ class ArticleFeatureMunger(ArticleMunger, metaclass=ABCMeta):
     def _to_array(self):
         features = self.features()
         if self.use_article_id:
-            return pd.get_dummies(self.df[['article_id'] + features], columns=features, prefix=features)
+            return pd.get_dummies(
+                self.df[["article_id"] + features], columns=features, prefix=features
+            )
         return pd.get_dummies(self.df[features], columns=features, prefix=features)
 
 
 class ArticleFeaturesSimpleFeatures(ArticleFeatureMunger):
-
     def features(self):
         return [
             "product_type_no",
@@ -49,39 +48,5 @@ class ArticleFeaturesSimpleFeatures(ArticleFeatureMunger):
         ]
 
 
-class ArticleKNN:
-    def __init__(self, articles: ArticleMunger, k=20):
-        self.k = k
-        self.a = articles
-        self.model = NearestNeighbors(n_neighbors=k).fit(articles.x.values)
-
-    def nearest(self, index=None, id=None, row=None):
-        if id is not None:
-            matches = self.a.df[self.a.df.article_id == id].index
-            index = matches[0]
-
-        if index is not None:
-            row = self.a.x.values[index]
-
-        row = row.reshape((1, -1))
-
-        return self.model.kneighbors(row)
 
 
-class ArticleKNN_new:
-    def __init__(self, dummies, k=20):
-        self.k = k
-        # self.a = articles
-        self.model = NearestNeighbors(n_neighbors=k).fit(dummies.values)
-
-    def nearest(self, index=None, id=None, row=None):
-        # if id is not None:
-        #     matches = self.a.df[self.a.df.article_id == id].index
-        #     index = matches[0]
-        #
-        # if index is not None:
-        #     row = self.a.x.values[index]
-
-        row = row.reshape((1, -1))
-
-        return self.model.kneighbors(row)

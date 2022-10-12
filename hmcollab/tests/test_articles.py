@@ -4,6 +4,7 @@ import numpy as np
 from numpy.linalg import norm
 import pandas as pd
 
+import hmcollab.models
 from hmcollab.directory_tree import HMDatasetDirectoryTree, read_with_article_id
 from hmcollab import articles
 from hmcollab import datasets
@@ -24,7 +25,9 @@ class TestArticles(unittest.TestCase):
         self.one_of_each_dummies = read_with_article_id(
             directories.qualifyname(one_of_each_dir, "one_of_each_dummies.csv")
         )
-        self.one_of_each_dataset = datasets.HMDataset(tree=HMDatasetDirectoryTree(one_of_each_dir))
+        self.one_of_each_dataset = datasets.HMDataset(
+            tree=HMDatasetDirectoryTree(one_of_each_dir)
+        )
 
     def tearDown(self):
         pass
@@ -33,7 +36,7 @@ class TestArticles(unittest.TestCase):
         return articles.ArticleFeaturesSimpleFeatures(self.dataset.articles.iloc[:17])
 
     def get_simple_knn(self):
-        return articles.ArticleKNN(self.get_simple(), 4)
+        return hmcollab.models.ArticleKNN(self.get_simple().x, 4)
 
     def test_article_simple_feature_array(self):
         a = self.get_simple()
@@ -76,28 +79,14 @@ class TestArticles(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_knn_by_index(self):
+        a = self.get_simple()
         knn = self.get_simple_knn()
         x = self.simple_onehot
 
         # choose row 10, for which there are two other exact matches
-        d, indices = knn.nearest(index=10)
+        row = a.x.values[10]
 
-        # check that actual distances match expected
-        expected = np.array([0, 0, 0, 2])
-        actual = np.array(d[0])
-        self.assertEqual(0, norm(actual - expected))
-
-        # check that actual indices match expected
-        expected = {12, 10, 2, 1}
-        actual = set(indices[0])
-        self.assertEqual(expected, actual)
-
-    def test_knn_by_id(self):
-        knn = self.get_simple_knn()
-        x = self.simple_onehot
-
-        # choose row 10, for which there are two other exact matches
-        d, indices = knn.nearest(id="0146730001")
+        d, indices = knn.nearest(row)
 
         # check that actual distances match expected
         expected = np.array([0, 0, 0, 2])
@@ -139,9 +128,15 @@ class TestArticles(unittest.TestCase):
 
     def test_one_of_each(self):
         # test load dataframe where each dummy has at least one non-zero entry
-        munger = articles.ArticleFeaturesSimpleFeatures(self.one_of_each_dataset.articles, use_article_id=True)
+        munger = articles.ArticleFeaturesSimpleFeatures(
+            self.one_of_each_dataset.articles, use_article_id=True
+        )
         self.assertEqual(self.one_of_each_dummies.shape[1], munger.x.shape[1])
         for index, expected in self.one_of_each_dummies.iterrows():
             article_id = expected.article_id
             actual = munger.x[munger.x.article_id == article_id].iloc[0]
-            self.assertEqual(expected.to_dict(), actual.to_dict(), msg="{} {}".format(index, article_id))
+            self.assertEqual(
+                expected.to_dict(),
+                actual.to_dict(),
+                msg="{} {}".format(index, article_id),
+            )
