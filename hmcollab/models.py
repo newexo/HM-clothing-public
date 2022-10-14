@@ -132,8 +132,9 @@ class KnnRecommender_new:
         self.t = transactions.TransactionsByCustomer_new(self.dataset.train_x)
         # self.t = transactions.TransactionsByCustomer(self.dataset.transactions_x)
         filtered_art_ids = filter_articles(self.dataset.train_x, threshold=threshold)
+        # I should select features here instead of full
         self.filtered_dummies = full_article_dummies[full_article_dummies.article_id.isin(
-            filtered_art_ids)].drop(columns="article_id")
+            filtered_art_ids)]
         filtered_articles = self.dataset.articles.loc[
             self.dataset.articles.article_id.isin(filtered_art_ids), :]
         self.filtered_articles_main_features = articles.ArticleFeaturesSimpleFeatures(
@@ -142,10 +143,12 @@ class KnnRecommender_new:
         self.recomendations_by_group = math.ceil(
             self.total_recommendations / self.groups
         )
-        self.model = ArticleKNN_new(
+        self.model = ArticleKNN(
             self.filtered_dummies, k=self.recomendations_by_group
         )
 
+    def article_id_from_index(self, i):
+        return self.filtered_dummies.iloc[i].article_id
 
     def recommend(self, customer, drop_duplicates=True):
         recomendation_ids = []
@@ -162,7 +165,7 @@ class KnnRecommender_new:
             # We can use filtered dummies here
             _, indices = self.model.nearest(row=one_group)    # same shape as filtered (with article_id)
             for r in indices[0][: self.recomendations_by_group]:
-                article_id = self.filtered_articles_main_features.id_from_index(r)
+                article_id = self.article_id_from_index(r)
                 recomendation_ids.append(article_id)
         return recomendation_ids
 
@@ -173,3 +176,4 @@ class KnnRecommender_new:
             df.loc[c] = {"prediction": " ".join(recommendations)}
         df = df.reset_index().rename(columns={"index": "customer_id"})
         return df
+
