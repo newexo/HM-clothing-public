@@ -18,7 +18,7 @@ def kmeans_consumer_old(customer, transactions_df, full_articles_dummy, k=1):
         customer
     )
     customer_dummies = full_articles_dummy.merge(
-        basket, on="article_id", how="right"
+        basket, on="article_id", how="left"
     ).drop(columns="article_id")
     kmeans = KMeans(
         init="k-means++", n_clusters=k, n_init=10, max_iter=300, random_state=42
@@ -135,7 +135,7 @@ class TestTransactions(unittest.TestCase):
         basket = t.all_article_ids(self.customer)
         full_articles_dummy = self.articles_munger.x
         customer_dummies = full_articles_dummy.merge(
-            basket, on="article_id", how="right"
+            basket, on="article_id", how="left"
         ).drop(columns="article_id")
 
         self.assertEqual(
