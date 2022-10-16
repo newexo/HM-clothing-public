@@ -11,9 +11,10 @@ class TransactionsByCustomer:
 
     def customer_dummies(self, customer, full_articles_dummy):
         basket = self.all_article_ids(customer)
-        return full_articles_dummy.merge(basket, on="article_id", how="left").drop(
+        return full_articles_dummy.merge(basket, on="article_id", how="inner").drop(
             columns="article_id"
         )
+
 
 class TransactionsByCustomer_new:
     def __init__(self, df: pd.DataFrame):
@@ -40,7 +41,6 @@ class TransactionsByCustomer_new:
         return full_articles_dummy.merge(basket, on="article_id", how="inner").drop(
             columns="article_id"
         )
-
 
 
 

@@ -45,8 +45,14 @@ class TestModels(unittest.TestCase):
             total_recommendations=6,
         )
         actual = recommender.recommend(self.customer)
-
-        expected = ['0703843001', '0795440001', '0796137001', '0754356001', '0567618001', '0663713001']
+        expected = [
+            "0726925001",
+            "0735843004",
+            "0559630026",
+            "0715624008",
+            "0783388001",
+            "0377277001",
+        ]
         self.assertEqual(expected, actual)
 
     def test_recommend_all(self):
@@ -68,11 +74,11 @@ class TestModels(unittest.TestCase):
 
         actual = df.prediction[0]
 
-        expected = '0754356001 0663713001 0703843001 0795440001'
+        expected = "0351484002 0663713001 0870304002 0578020002"
         self.assertEqual(expected, actual)
 
         actual = df.prediction[1]
-        expected = '0703843001 0795440001 0754356001 0663713001'
+        expected = "0726925001 0735843004 0715624008 0783388001"
         self.assertEqual(expected, actual)
 
     def test_recommend_all_drop_duplicates(self):
@@ -94,11 +100,11 @@ class TestModels(unittest.TestCase):
 
         actual = df.prediction[0]
 
-        expected = '0703843001 0795440001 0754356001 0567618001'
+        expected = "0351484002 0723529001 0727808001 0852643001"
         self.assertEqual(expected, actual)
 
         actual = df.prediction[1]
-        expected = '0703843001 0795440001 0754356001 0567618001'
+        expected = "0726925001 0735843004 0715624008 0783388001"
         self.assertEqual(expected, actual)
 
     def test_popular_recommender(self):
