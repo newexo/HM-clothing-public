@@ -27,3 +27,11 @@ def data(filename=None):
 
 def testdata(filename=None):
     return qualifyname(os.path.join(tests(), "testdata"), filename)
+
+
+def experiments(filename=None):
+    return qualifyname(os.path.join(base(), "experiments"), filename)
+
+
+def models(filename=None):
+    return qualifyname(os.path.join(base(), "models"), filename)

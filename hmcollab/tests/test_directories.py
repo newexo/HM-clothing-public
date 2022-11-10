@@ -17,6 +17,8 @@ class TestDirectories(unittest.TestCase):
         self.assertTrue(os.path.isdir(directories.tests()))
         self.assertTrue(os.path.isdir(directories.data()))
         self.assertTrue(os.path.isdir(directories.testdata()))
+        self.assertTrue(os.path.isdir(directories.experiments()))
+        self.assertTrue(os.path.isdir(directories.models()))
 
     def test_filenames(self):
         self.assertTrue(os.path.exists(directories.base('README.md')))
@@ -24,3 +26,5 @@ class TestDirectories(unittest.TestCase):
         self.assertTrue(os.path.exists(directories.tests('__init__.py')))
         self.assertTrue(os.path.exists(directories.data('README.md')))
         self.assertTrue(os.path.exists(directories.testdata('README.md')))
+        self.assertTrue(os.path.exists(directories.experiments('README.md')))
+        self.assertTrue(os.path.exists(directories.models('README.md')))
