@@ -60,6 +60,7 @@ if __name__ == "__main__":
     toy : True    # True to use toy dataset
     threshold: 50    # Threshold to filter articles. Suggested: 50 for toy, 300 for full
     split_strategy: "standard"    # Splitting strategy. So far only "standard"
+    experiments: [{features: ['fet1', 'fet2']}, {features: ['fet2', 'fet5']]   # Experiments and their features
     """
 
     if len(sys.argv) > 1:
@@ -71,11 +72,16 @@ if __name__ == "__main__":
         config = yaml.safe_load(file)
 
     toy = datasets.HMDataset(toy=config["toy"], folds=config["split_strategy"])
-    features1 = articles.ArticleFeaturesSimpleFeatures(
-        toy.articles, use_article_id=True
-    )
-    toy_k = StandardSetup(toy, features=features1)
-    results = toy_k.try_multiple_k(config["k"])
 
-    with open(yaml_path, "a") as outfile:
-        yaml.dump({"Results": results}, outfile, default_flow_style=False)
+    i = 0
+
+    for exp in config["experiments"]:
+        i += 1
+        the_features = articles.ArticleFeatureMungerSpecificFeatures(
+            toy.articles, features=exp["features"], use_article_id=True
+        )
+        toy_k = StandardSetup(toy, features=the_features)
+        results = toy_k.try_multiple_k(config["k"])
+
+        with open(yaml_path, "a") as outfile:
+            yaml.dump({"Results" + "_experiment_" + str(i): results}, outfile, default_flow_style=False)
