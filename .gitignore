@@ -138,5 +138,21 @@ data/images
 # ignore folder for Gina
 gina/
 
-# ignore MacOS generated files
+# Latex
+*.aux
+*.bbl
+*.blg
+*.out
+*.lof
+*.toc
+*-blx.bib
+*.nav
+*.run.xml
+*.snm
+
+# Misc
+CVS
+*.pdf
+
+# MacOS
 .DS_Store
