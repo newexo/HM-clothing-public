@@ -26,6 +26,7 @@ So far we implementend two different recommending models:
   + kmeans from the transactions of the user using the centroid to find the nearest neighbors (KNN). KNN uses the full articles dataset
   + Recommendations customized by user
 
-### Split strategies
-+ **Standard (leave last week)**: Split transactions in three using a cutoff date (default days=7)
-+ **Folds** : Split customers in two or three subsets and each subset is also split in the standard fashion
+### Split strategies (folds)
++ **standard (leave last week)**: Split transactions in three using a cutoff date (default days=7)
++ **twosets:** Split the transactions by customer in two sets. Each of them with their respective train and test sets split by a cutoff date (train_x, train_y, test_x, test_y; where y is the target)
++ **threesets:** Split the transactions by customer in three sets. Each of them with their respective train and test sets split by a cutoff date (train_x, test_y; val_x, val_y; test_x, test_y; where y is the target)

@@ -72,8 +72,7 @@ experiments:
 #  - 0.00023412371538401197
 
 # ====== NEW RESULTS using articles.ArticleFeatureMungerSpecificFeatures() class =======
-
-
+# This took about 4 minutes
 Results_experiment_1:
   k:
   - 2
@@ -81,3 +80,10 @@ Results_experiment_1:
   - 0.0005672726915769587
   map_at_k_validation:
   - 0.0004463567581360003
+Results_experiment_2:
+  k:
+  - 2
+  map_at_k_test:
+  - 0.0005727888033082838
+  map_at_k_validation:
+  - 0.0006624107633168589
