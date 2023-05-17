@@ -2,6 +2,7 @@
 This directory will contain training and test files. Most files in it will not be checked in to git.
 
 ## Original datasets from Kaggle:
+
 transactions_train.csv: 31,788,324 records
 + Transactions from 09/20/2018 to 09/22/2020
 + columns: 't_dat', 'customer_id', 'article_id', 'price', 'sales_channel_id'

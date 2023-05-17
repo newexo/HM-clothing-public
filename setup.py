@@ -15,9 +15,14 @@ def forbid_publish():
 
 forbid_publish()
 
+
+with open("hmcollab/_version.py") as f:
+    version = f.readlines()[-1].split()[-1].strip("\"'")
+
+
 setup(
     name="hmcollab",
-    version="0.0.1",
+    version=version,
     author="Reuben Brasher and Georgina Gonzalez",
     install_requires=[],
     packages=find_packages(),
