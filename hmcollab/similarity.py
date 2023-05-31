@@ -14,6 +14,7 @@ class Similarity(metaclass=ABCMeta):
                 if self.similarity(i, j):
                     return True
             return False
+
         comparisons = np.array([is_in_target(i) for i in predicted])
         return comparisons
 
@@ -22,8 +23,8 @@ class IdenticalSimilarity(Similarity):
     def similarity(self, id0, id1):
         return id0 == id1
 
-    # def compare_one(self, predicted, target):
-    #     return np.isin(predicted, target)
+    def compare_one(self, predicted, target):
+        return np.isin(predicted, target)
 
 
 class DepartmentSimilarity(Similarity):
