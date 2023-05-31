@@ -43,7 +43,7 @@ class TestModels(unittest.TestCase):
             self.full_dummies,
             groups=2,
             total_recommendations=6,
-            threshold=0
+            threshold=0,
         )
         actual = recommender.recommend(self.customer)
         expected = [
@@ -62,7 +62,7 @@ class TestModels(unittest.TestCase):
             self.full_dummies,
             groups=2,
             total_recommendations=4,
-            threshold=0
+            threshold=0,
         )
         df = recommender.recommend_all(self.customer_list, drop_duplicates=False)
 
@@ -89,7 +89,7 @@ class TestModels(unittest.TestCase):
             self.full_dummies,
             groups=2,
             total_recommendations=4,
-            threshold=0
+            threshold=0,
         )
         df = recommender.recommend_all(self.customer_list, drop_duplicates=True)
 
@@ -116,7 +116,7 @@ class TestModels(unittest.TestCase):
             self.full_dummies,
             groups=2,
             total_recommendations=4,
-            threshold=2
+            threshold=2,
         )
         df = recommender.recommend_all(self.customer_list, drop_duplicates=True)
 
@@ -130,11 +130,11 @@ class TestModels(unittest.TestCase):
 
         actual = df.prediction[0]
 
-        expected = '0351484002 0723529001 0351484002 0723529001'
+        expected = "0351484002 0723529001 0351484002 0723529001"
         self.assertEqual(expected, actual)
 
         actual = df.prediction[1]
-        expected = '0351484002 0723529001 0351484002 0723529001'
+        expected = "0351484002 0723529001 0351484002 0723529001"
         self.assertEqual(expected, actual)
 
     def test_popular_recommender(self):
@@ -197,3 +197,4 @@ class TestModels(unittest.TestCase):
             print(scoring.precision_at_k(t[0][: i + 1]))
         print("ap_at_k:", scoring.ap_at_k(t[0]))
         print("map_at_k:", scoring.map_at_k(t))
+        self.fail("incomplete")
