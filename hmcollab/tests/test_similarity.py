@@ -91,6 +91,12 @@ class TestSimilarity(unittest.TestCase):
     def test_identical_compare_one(self):
         sim = IdenticalSimilarity()
         p = self.ids
+
+        r = []
+        expected = [False] * 4
+        actual = list(sim.compare_one(p, r))
+        self.assertEqual(expected, actual)
+
         r = ["0794321007"]
         expected = [False] * 4
         actual = list(sim.compare_one(p, r))
@@ -114,6 +120,12 @@ class TestSimilarity(unittest.TestCase):
     def test_department_compare_one(self):
         sim = self.get_department_similarity()
         p = self.ids
+
+        r = []
+        expected = [False] * 4
+        actual = list(sim.compare_one(p, r))
+        self.assertEqual(expected, actual)
+
         r = ["0794321007"]
         expected = [False] * 4
         actual = list(sim.compare_one(p, r))
