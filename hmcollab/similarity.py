@@ -1,4 +1,18 @@
-class IdenticalSimilarity:
+import numpy as np
+
+from abc import ABCMeta, abstractmethod
+
+
+class Similarity(metaclass=ABCMeta):
+    @abstractmethod
+    def similarity(self, id0, id1):
+        pass
+
+    def compare_one(self, predicted, target):
+        return np.isin(predicted, target)
+
+
+class IdenticalSimilarity(Similarity):
     def similarity(self, id0, id1):
         return id0 == id1
 

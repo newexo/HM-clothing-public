@@ -56,3 +56,20 @@ class TestSimilarity(unittest.TestCase):
         # the second and third rows have same department_no, but the first row does not
         self.assertTrue(sim.similarity_by_iloc(1, 2))
         self.assertFalse(sim.similarity_by_iloc(0, 1))
+
+    def test_identical_compare_one(self):
+        sim = IdenticalSimilarity()
+        p = "0351484002 0723529001 0811835004 0689898002 0640174001 0797065001 0599580055 0811927004 0811925005 0800436010 0666448006 0663713001".split(
+            " "
+        )
+        r = "0794321007"
+        expected = [False] * 12
+        actual = list(sim.compare_one(p, r))
+        self.assertEqual(expected, actual)
+
+        r = "0351484002"
+        expected = [True] + [False] * 11
+        actual = list(sim.compare_one(p, r))
+        self.assertEqual(expected, actual)
+
+        self.fail("incomplete")
