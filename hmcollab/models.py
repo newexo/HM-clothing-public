@@ -85,6 +85,76 @@ class KnnRecommender:
         recomendation_ids = []
         # We need full dummies for kmeans
         customer_dummies = self.t.customer_dummies(customer, self.full_article_dummies)
+        if customer_dummies.shape[0] == 0:
+            print('No dummies for customer: ', customer)
+        if drop_duplicates:
+            customer_dummies = customer_dummies.drop_duplicates()  # no article_id
+        min_k = self.groups
+        if customer_dummies.shape[0] < self.groups:
+            min_k = customer_dummies.shape[
+                0
+            ]  # so far it will produce less recommendations for this customer
+        all_groups = transactions.kmeans_consumer(customer_dummies, k=min_k)
+        for i in range(min_k):
+            one_group = all_groups.cluster_centers_[i]
+            # We can use filtered dummies here
+            _, indices = self.model.nearest(
+                row=one_group
+            )  # same shape as filtered (with article_id)
+            for r in indices[0][: self.recomendations_by_group]:
+                article_id = self.filtered_dummies.iloc[r].article_id
+                recomendation_ids.append(article_id)
+        return recomendation_ids
+
+    def recommend_all(self, customer_list, drop_duplicates=True):
+        df = pd.DataFrame(columns=["prediction"], index=customer_list)
+        for c in customer_list:
+            recommendations = self.recommend(c, drop_duplicates=drop_duplicates)
+            df.loc[c] = {"prediction": " ".join(recommendations)}
+        df = df.reset_index().rename(columns={"index": "customer_id"})
+        return df
+
+class KnnRecommender_for3:
+    def __init__(
+        self,
+        dataset,
+        full_article_dummies,
+        groups=6,
+        total_recommendations=12,
+        threshold=50,
+        split='train'
+    ):
+        self.dataset = dataset
+        self.full_article_dummies = full_article_dummies
+        self.groups = groups
+        self.total_recommendations = total_recommendations
+        if split=='train':
+            self.t = transactions.TransactionsByCustomer(self.dataset.train_x)
+            filtered_art_ids = filter_articles(self.dataset.train_x, threshold=threshold)
+            print('Articles at train: ', len(filtered_art_ids))
+        if split=='val':
+            self.t = transactions.TransactionsByCustomer(self.dataset.val_x)
+            filtered_art_ids = filter_articles(self.dataset.val_x, threshold=threshold)
+            print('Articles at val: ', len(filtered_art_ids))
+        if split=='test':
+            self.t = transactions.TransactionsByCustomer(self.dataset.test_x)
+            filtered_art_ids = filter_articles(self.dataset.test_x, threshold=threshold)
+            print('Articles at test: ', len(filtered_art_ids))
+        # I should select features here instead of full
+        self.filtered_dummies = full_article_dummies[
+            full_article_dummies.article_id.isin(filtered_art_ids)
+        ]
+        self.recomendations_by_group = math.ceil(
+            self.total_recommendations / self.groups
+        )
+        self.model = ArticleKNN(self.filtered_dummies, k=self.recomendations_by_group)
+
+    def recommend(self, customer, drop_duplicates=True):
+        recomendation_ids = []
+        # We need full dummies for kmeans
+        customer_dummies = self.t.customer_dummies(customer, self.full_article_dummies)
+        if customer_dummies.shape[0] == 0:
+            print('No dummies for customer: ', customer)
         if drop_duplicates:
             customer_dummies = customer_dummies.drop_duplicates()  # no article_id
         min_k = self.groups
