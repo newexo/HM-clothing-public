@@ -27,7 +27,7 @@ class IdenticalSimilarity(Similarity):
         return np.isin(predicted, target)
 
 
-class DepartmentSimilarity(Similarity):
+class ArticleSimilarity(Similarity, metaclass=ABCMeta):
     def __init__(self, df):
         self.df = df
 
@@ -50,5 +50,26 @@ class DepartmentSimilarity(Similarity):
         row1 = self.df.iloc[index1]
         return self.similarity_by_row(row0, row1)
 
+    @abstractmethod
+    def similarity_by_row(self, row0, row1):
+        pass
+
+
+class DepartmentSimilarity(ArticleSimilarity):
     def similarity_by_row(self, row0, row1):
         return row0.department_no == row1.department_no
+
+
+class ProductCodeSimilarity(ArticleSimilarity):
+    def similarity_by_row(self, row0, row1):
+        return row0.product_code == row1.product_code
+
+
+class ColourGroupCodeSimilarity(ArticleSimilarity):
+    def similarity_by_row(self, row0, row1):
+        return row0.colour_group_code == row1.colour_group_code
+
+
+class GarmentGroupNoSimilarity(ArticleSimilarity):
+    def similarity_by_row(self, row0, row1):
+        return row0.garment_group_no == row1.garment_group_no

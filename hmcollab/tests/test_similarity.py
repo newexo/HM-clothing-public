@@ -3,7 +3,13 @@ import unittest
 from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab import datasets
 from hmcollab import directories
-from hmcollab.similarity import IdenticalSimilarity, DepartmentSimilarity
+from hmcollab.similarity import (
+    IdenticalSimilarity,
+    DepartmentSimilarity,
+    ProductCodeSimilarity,
+    ColourGroupCodeSimilarity,
+    GarmentGroupNoSimilarity,
+)
 
 
 class TestSimilarity(unittest.TestCase):
@@ -72,7 +78,20 @@ class TestSimilarity(unittest.TestCase):
 
     def test_identical_compare_one_general(self):
         sim = IdenticalSimilarity()
-        p = ['0351484002', '0723529001', '0811835004', '0689898002', '0640174001', '0797065001', '0599580055', '0811927004', '0811925005', '0800436010', '0666448006', '0663713001']
+        p = [
+            "0351484002",
+            "0723529001",
+            "0811835004",
+            "0689898002",
+            "0640174001",
+            "0797065001",
+            "0599580055",
+            "0811927004",
+            "0811925005",
+            "0800436010",
+            "0666448006",
+            "0663713001",
+        ]
         r = ["0794321007"]
         expected = [False] * 12
         actual = list(sim.compare_one(p, r))
@@ -85,7 +104,20 @@ class TestSimilarity(unittest.TestCase):
 
         r = ["0794321007", "0351484002", "0689898002", "0800436010"]
         actual = list(sim.compare_one(p, r))
-        expected = [True, False, False, True, False, False, False, False, False, True, False, False]
+        expected = [
+            True,
+            False,
+            False,
+            True,
+            False,
+            False,
+            False,
+            False,
+            False,
+            True,
+            False,
+            False,
+        ]
         self.assertEqual(expected, actual)
 
     def test_identical_compare_one(self):
@@ -132,7 +164,7 @@ class TestSimilarity(unittest.TestCase):
         self.assertEqual(expected, actual)
 
         r = [self.id2]
-        expected =[False, True, True, True]
+        expected = [False, True, True, True]
         actual = list(sim.compare_one(p, r))
         self.assertEqual(expected, actual)
 
@@ -145,3 +177,30 @@ class TestSimilarity(unittest.TestCase):
         actual = list(sim.compare_one(p, r))
         expected = [True, True, True, True]
         self.assertEqual(expected, actual)
+
+    def test_product_code_similarity(self):
+        sim = ProductCodeSimilarity(self.dataset.articles)
+        i = "0118458038"
+        j = "0118458039"
+        row_i = sim.row_from_article_id(i)
+        row_j = sim.row_from_article_id(j)
+        self.assertEqual(row_i.product_code, row_j.product_code)
+        self.assertTrue(sim.similarity(i, j))
+
+    def test_colour_group_code_similarity(self):
+        sim = ColourGroupCodeSimilarity(self.dataset.articles)
+        i = "0887593002"
+        j = "0611584007"
+        row_i = sim.row_from_article_id(i)
+        row_j = sim.row_from_article_id(j)
+        self.assertEqual(row_i.colour_group_code, row_j.colour_group_code)
+        self.assertTrue(sim.similarity(i, j))
+
+    def test_garment_group_no_similarity(self):
+        sim = GarmentGroupNoSimilarity(self.dataset.articles)
+        i = "0866383001"
+        j = "0599580055"
+        row_i = sim.row_from_article_id(i)
+        row_j = sim.row_from_article_id(j)
+        self.assertEqual(row_i.garment_group_no, row_j.garment_group_no)
+        self.assertTrue(sim.similarity(i, j))
