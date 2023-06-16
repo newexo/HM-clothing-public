@@ -73,3 +73,10 @@ class ColourGroupCodeSimilarity(ArticleSimilarity):
 class GarmentGroupNoSimilarity(ArticleSimilarity):
     def similarity_by_row(self, row0, row1):
         return row0.garment_group_no == row1.garment_group_no
+
+
+def get_similarity(similarity_name, articles_df):
+    if similarity_name == "product_code":
+        return ProductCodeSimilarity(articles_df)
+
+    return IdenticalSimilarity()

@@ -2,14 +2,16 @@ from hmcollab import datasets
 from hmcollab import articles
 from hmcollab import models
 from hmcollab import scoring
+from hmcollab import similarity
 from hmcollab import directories
+
 
 import yaml
 import sys
 
 
 class StandardSetup:
-    def __init__(self, dataset, features, use_toy=True):
+    def __init__(self, dataset, features, similarity, use_toy=True):
         self.data = dataset
         self.dummies = features.x
         # Only keep customers at train_x and train_y
@@ -23,7 +25,9 @@ class StandardSetup:
         self.threshold = 300
         if use_toy:
             self.threshold = 50
+        # TODO: Is this right?
         self.rel_vy = datasets.target_to_relevant(toy.train_vy)
+        self.similarity = similarity
 
     def try_multiple_k(self, k_list):
         scores_validation = []
@@ -33,11 +37,12 @@ class StandardSetup:
                 self.data, self.dummies, groups=k, threshold=self.threshold
             )
             recommendations = model.recommend_all(list(self.customers_at_vy))
-            t = scoring.relevant(recommendations, self.rel_vy)
+            # TODO: Is this right?
+            t = scoring.relevant(recommendations, self.rel_vy, similarity=self.similarity)
             score_vy = scoring.map_at_k(t)
             scores_validation.append(score_vy)
             recommendations = model.recommend_all(list(self.customers_at_y))
-            t = scoring.relevant(recommendations, self.data.relevant_set)
+            t = scoring.relevant(recommendations, self.data.relevant_set, similarity=self.similarity)
             score_y = scoring.map_at_k(t)
             scores_test.append(score_y)
         scores_validation_float = [float(x) for x in scores_validation]
@@ -49,7 +54,8 @@ class StandardSetup:
         }
 
 class ThreeSetsSetup:
-    def __init__(self, dataset, features, use_toy=True, threshold=10):
+    def __init__(self, dataset, features, similarity, use_toy=True, threshold=10):
+        # TODO: We never use use_toy
         self.data = dataset
         self.dummies = features.x
         # Only keep customers at train_x and train_y
@@ -74,6 +80,7 @@ class ThreeSetsSetup:
         self.rel_y = datasets.target_to_relevant(toy.train_y)   # toy=316
         self.rel_vy = datasets.target_to_relevant(toy.val_y)    # toy=107
         self.rel_ty = datasets.target_to_relevant(toy.test_y)   # toy=127
+        self.similarity = similarity
 
     def try_multiple_k(self, k_list):
         def experiment(k, threshold):
@@ -82,21 +89,21 @@ class ThreeSetsSetup:
                 self.data, self.dummies, groups=k, threshold=threshold, split='train'
             )
             recommendations = model.recommend_all(list(self.customers_at_y))
-            t = scoring.relevant(recommendations, self.rel_y)
+            t = scoring.relevant(recommendations, self.rel_y, similarity=self.similarity)
             score_y = scoring.map_at_k(t)
             print('PROCESSING VALIDATION SET...')
             model = models.KnnRecommender_for3(
                 self.data, self.dummies, groups=k, threshold=threshold, split='val'
             )
             recommendations = model.recommend_all(list(self.customers_at_vy))
-            t = scoring.relevant(recommendations, self.rel_vy)
+            t = scoring.relevant(recommendations, self.rel_vy, similarity=self.similarity)
             score_vy = scoring.map_at_k(t)
             print('PROCESSING TEST SET...')
             model = models.KnnRecommender_for3(
                 self.data, self.dummies, groups=k, threshold=threshold, split='test'
             )
             recommendations = model.recommend_all(list(self.customers_at_ty))
-            t = scoring.relevant(recommendations, self.rel_ty)
+            t = scoring.relevant(recommendations, self.rel_ty, similarity=self.similarity)
             score_ty = scoring.map_at_k(t)
             return score_y, score_vy, score_ty
         
@@ -129,17 +136,19 @@ if __name__ == "__main__":
     and trying the different k's on all of them
 
     """
+    # TODO: only does toy data right now
 
     if len(sys.argv) > 1:
         yaml_path = sys.argv[1]
     else:
         # yaml_path = directories.experiments("knn_exp1.yml")
-        yaml_path = directories.experiments("knn_exp3.yml")
+        yaml_path = directories.experiments("knn_exp4.yml")
 
     with open(yaml_path, "r") as file:
         config = yaml.safe_load(file)
 
     toy = datasets.HMDataset(toy=config["toy"], folds=config["split_strategy"])
+    sim = similarity.get_similarity(config.get("similarity", None), toy.articles)
 
     i = 0
 
@@ -149,9 +158,9 @@ if __name__ == "__main__":
             toy.articles, features=exp["features"], use_article_id=True
         )
         if config["split_strategy"] == 'threesets':
-            toy_k = ThreeSetsSetup(toy, features=the_features, threshold=config["threshold"]) 
+            toy_k = ThreeSetsSetup(toy, similarity=sim, features=the_features, threshold=config["threshold"])
         else:   
-            toy_k = StandardSetup(toy, features=the_features)
+            toy_k = StandardSetup(toy, similarity=sim, features=the_features)
         results = toy_k.try_multiple_k(config["k"])
 
         with open(yaml_path, "a") as outfile:
