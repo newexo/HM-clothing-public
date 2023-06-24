@@ -19,8 +19,9 @@ Results_experiment_1:
   k:
   - 2
   map_at_k_test:
-  - 0.0025402837902837906
+  - 0.00254028379028379
   map_at_k_train:
   - 0.0021219579763883563
   map_at_k_validation:
   - 0.0016250342769034358
+  minutes: 4.759942683333334

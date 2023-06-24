@@ -8,6 +8,7 @@ from hmcollab import directories
 
 import yaml
 import sys
+from datetime import datetime
 
 
 class StandardSetup:
@@ -153,6 +154,7 @@ if __name__ == "__main__":
     i = 0
 
     for exp in config["experiments"]:
+        begin = datetime.now()
         i += 1
         the_features = articles.ArticleFeatureMungerSpecificFeatures(
             toy.articles, features=exp["features"], use_article_id=True
@@ -162,6 +164,9 @@ if __name__ == "__main__":
         else:   
             toy_k = StandardSetup(toy, similarity=sim, features=the_features)
         results = toy_k.try_multiple_k(config["k"])
+
+        minutes = (datetime.now()-begin).total_seconds()/60
+        results['minutes'] = minutes
 
         with open(yaml_path, "a") as outfile:
             yaml.dump({"Results" + "_experiment_" + str(i): results}, outfile, default_flow_style=False)
