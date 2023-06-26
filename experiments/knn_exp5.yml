@@ -1,0 +1,28 @@
+description : "use knn recommender on toy dataset using the threesets split strategy"
+
+k: [2]
+toy : True
+threshold: 30
+split_strategy: "threesets"
+similarity: "department_no"
+experiments:
+    - {features: [
+            "product_type_no",
+            "product_group_name",
+            "department_no",
+            "section_no",
+            ]}
+
+
+# ==== RESULTS ======
+
+Results_experiment_1:
+  k:
+  - 2
+  map_at_k_test:
+  - 0.05260788658897902
+  map_at_k_train:
+  - 0.05578071058688148
+  map_at_k_validation:
+  - 0.05176632816819732
+  minutes: 4.51904895
