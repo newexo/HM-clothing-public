@@ -163,38 +163,30 @@ class TestModels(unittest.TestCase):
 
         self.assertEqual(expected, actual_recommend)
 
-        # 2. Test recommend_all
         actual_recommend_all = recommender.recommend_all(self.customer_list)
 
-        # 2.1 Is the number of rows right?
         actual_rows = actual_recommend_all.shape[0]
         expected = len(self.customer_list)
         self.assertEqual(expected, actual_rows)
 
-        # 2.2 Check that recommend_all is getting the same prediction for all customers
         actual = actual_recommend_all.prediction.value_counts().shape[0]
         expected = 1
         self.assertEqual(expected, actual)
 
-        # 2.3 Is the recommendation right for all?
         actual = actual_recommend_all.iloc[0, 1]
         expected = " ".join(actual_recommend)
         self.assertEqual(expected, actual)
 
-        # cwd = '/Users/gina/Desktop/Gina/MachineLearning/Proyectos/HM/HM-clothing-project'
-        # y_by_customer = pd.read_csv(cwd+'/data/target_set_7d_75481u.csv')
         y_by_customer = pd.read_csv(
             directories.data(filename="target_set_7d_75481u.csv")
         )
 
+        # originally, prediction failed for all. Fix so that one recommendation is correct to test ap_at_k and map_at_k
+        actual_recommend_all.prediction = actual_recommend_all.iloc[0].prediction.replace("0811835004", "0794321007")
         t = scoring.relevant(actual_recommend_all, y_by_customer)
-        print("\nRelevant:\n", t)
-        print("\nCustomers with transactions in the last 7 days:", t.shape)
-        print("\nCustomers with transactions in the last 7 days:", t[0].shape)
+        self.assertEqual((1,), t.shape)
+        self.assertEqual((12,), t[0].shape)
+        self.assertEqual([False, False, True, False, False, False, False, False, False, False, False, False], list(t[0]))
 
-        print("precision_at_k:")
-        for i in range(len(t[0])):
-            print(scoring.precision_at_k(t[0][: i + 1]))
-        print("ap_at_k:", scoring.ap_at_k(t[0]))
-        print("map_at_k:", scoring.map_at_k(t))
-        self.fail("incomplete")
+        self.assertAlmostEquals(0.027777777777777776, scoring.ap_at_k(t[0]))
+        self.assertAlmostEquals(0.027777777777777776, scoring.map_at_k(t))
