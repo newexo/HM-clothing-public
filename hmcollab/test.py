@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import unittest
+import argparse
 
 from hmcollab.tests.test_articles import TestArticles
 from hmcollab.tests.test_datasets import TestDatasets
@@ -7,6 +8,9 @@ from hmcollab.tests.test_directories import TestDirectories
 from hmcollab.tests.test_example import TestExample
 from hmcollab.tests.test_scoring import TestScoring
 from hmcollab.tests.test_transactions import TestTransactions
+
+# integration tests
+from hmcollab.tests.integration_tests.test_data_exists import TestDataExists
 
 
 class CountSuite(object):
@@ -20,7 +24,7 @@ class CountSuite(object):
         self.s.addTest(unittest.makeSuite(tests))
 
 
-def suite():
+def suite(integration):
     s = CountSuite()
 
     s.add(TestArticles)
@@ -30,9 +34,20 @@ def suite():
     s.add(TestScoring)
     s.add(TestTransactions)
 
+    if integration:
+        print("Running integration tests.")
+        s.add(TestDataExists)
+
     return s.s
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Tests for HM Collab Project")
+    parser.add_argument(
+        "--integration",
+        help="Whether to call tests which require dataset to be installed and generated files.",
+        default=None
+    )
+    args = parser.parse_args()
     runner = unittest.TextTestRunner()
-    runner.run(suite())
+    runner.run(suite(args.integration))

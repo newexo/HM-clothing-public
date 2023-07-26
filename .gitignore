@@ -134,6 +134,7 @@ dmypy.json
 # ignore project specifc data and models
 data/*.csv
 data/images
+hmcollab/tests/testdata/fivehundred/*.csv
 
 # ignore folder for Gina
 gina/
