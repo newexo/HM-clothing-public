@@ -133,6 +133,7 @@ dmypy.json
 
 # ignore project specifc data and models
 data/*.csv
+data/*/*.csv
 data/images
 hmcollab/tests/testdata/fivehundred/*.csv
 
