@@ -8,11 +8,11 @@ from hmcollab import splitter
 def customer_split(dataset, customer_count):
     r = np.random.RandomState(42)
 
-    selected_custumers = r.choice(
+    selected_customers = r.choice(
         dataset.transactions_y.customer_id.unique(), size=customer_count, replace=False
     )
 
-    portion = splitter.CustomerPortion(selected_custumers)
+    portion = splitter.CustomerPortion(selected_customers)
     return portion.split(dataset)
 
 
