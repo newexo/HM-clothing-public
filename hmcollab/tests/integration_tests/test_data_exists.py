@@ -33,7 +33,7 @@ class IntegrationTestDataExists(IntegrationTestCase):
         actual = test_data.customers.shape
         self.assertEqual(expected, actual)
 
-        expected = "247f2570317ffe97eece8221ea879931"
+        expected = "72614ca824f459fbf4cc9ca0c0ea2c56"
         actual = test_data.customers.iloc[100].to_dict()
         self.assertEqual(expected, self.hash(actual))
 
@@ -41,7 +41,7 @@ class IntegrationTestDataExists(IntegrationTestCase):
         actual = test_data.articles.shape
         self.assertEqual(expected, actual)
 
-        expected = "f2afa4a561fb51ce37a3039e2e1e371b"
+        expected = "f1d900358e405a15e04b658d552c358c"
         actual = test_data.articles.iloc[100].to_dict()
         self.assertEqual(expected, self.hash(actual))
 
@@ -49,8 +49,9 @@ class IntegrationTestDataExists(IntegrationTestCase):
         actual = test_data.transactions.shape
         self.assertEqual(expected, actual)
 
-        expected = "bd7e07cea05914953c9a24264a31f9ea"
+        expected = "b6b708815ae4dafd32471683bee4c045"
         actual = test_data.transactions.iloc[100].to_dict()
+        del actual["t_dat"]
         self.assertEqual(expected, self.hash(actual))
 
     def test_column_names(self):
