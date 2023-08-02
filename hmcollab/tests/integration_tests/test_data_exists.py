@@ -1,24 +1,104 @@
-import unittest
 import os
 
 from hmcollab import directories
 from hmcollab.directory_tree import HMDatasetDirectoryTree
+from hmcollab.datasets import HMDataset
+from hmcollab.tests.integration_tests.integration_testcase import IntegrationTestCase
 
 
-class TestDataExists(unittest.TestCase):
+class IntegrationTestDataExists(IntegrationTestCase):
     def setUp(self):
-        pass
+        self.test_data_tree = HMDatasetDirectoryTree(
+            base=directories.testdata("fivehundred")
+        )
 
     def tearDown(self):
         pass
 
     def test_full_data_exists(self):
-        os.path.exists(directories.data("articles.csv"))
-        os.path.exists(directories.data("customers.csv"))
-        os.path.exists(directories.data("transactions_train.csv"))
+        self.assertTrue(os.path.exists(directories.data("articles.csv")))
+        self.assertTrue(os.path.exists(directories.data("customers.csv")))
+        self.assertTrue(os.path.exists(directories.data("transactions_train.csv")))
 
     def test_test_data_exists(self):
-        tree = HMDatasetDirectoryTree(base=directories.testdata())
-        os.path.exists(tree.articles)
-        os.path.exists(tree.customers)
-        os.path.exists(tree.transactions)
+        self.assertTrue(os.path.exists(self.test_data_tree.articles))
+        self.assertTrue(os.path.exists(self.test_data_tree.customers))
+        self.assertTrue(os.path.exists(self.test_data_tree.transactions))
+
+    def test_test_data_contents(self):
+        # Verify that shapes and a single row for test data customers, articles and transactions are as expected
+        test_data = HMDataset(tree=self.test_data_tree)
+
+        expected = (500, 7)
+        actual = test_data.customers.shape
+        self.assertEqual(expected, actual)
+
+        expected = "247f2570317ffe97eece8221ea879931"
+        actual = test_data.customers.iloc[100].to_dict()
+        self.assertEqual(expected, self.hash(actual))
+
+        expected = (16497, 25)
+        actual = test_data.articles.shape
+        self.assertEqual(expected, actual)
+
+        expected = "f2afa4a561fb51ce37a3039e2e1e371b"
+        actual = test_data.articles.iloc[100].to_dict()
+        self.assertEqual(expected, self.hash(actual))
+
+        expected = (30094, 5)
+        actual = test_data.transactions.shape
+        self.assertEqual(expected, actual)
+
+        expected = "bd7e07cea05914953c9a24264a31f9ea"
+        actual = test_data.transactions.iloc[100].to_dict()
+        self.assertEqual(expected, self.hash(actual))
+
+    def test_column_names(self):
+        # Verify column names for test data customers, articles and transactions are as expected
+        test_data = HMDataset(tree=self.test_data_tree)
+
+        expected = [
+            "customer_id",
+            "FN",
+            "Active",
+            "club_member_status",
+            "fashion_news_frequency",
+            "age",
+            "postal_code",
+        ]
+        actual = list(test_data.customers.columns)
+        self.assertEqual(expected, actual)
+
+        expected = [
+            "article_id",
+            "product_code",
+            "prod_name",
+            "product_type_no",
+            "product_type_name",
+            "product_group_name",
+            "graphical_appearance_no",
+            "graphical_appearance_name",
+            "colour_group_code",
+            "colour_group_name",
+            "perceived_colour_value_id",
+            "perceived_colour_value_name",
+            "perceived_colour_master_id",
+            "perceived_colour_master_name",
+            "department_no",
+            "department_name",
+            "index_code",
+            "index_name",
+            "index_group_no",
+            "index_group_name",
+            "section_no",
+            "section_name",
+            "garment_group_no",
+            "garment_group_name",
+            "detail_desc",
+        ]
+        actual = list(test_data.articles.columns)
+        self.assertEqual(expected, actual)
+
+        expected = ["t_dat", "customer_id", "article_id", "price", "sales_channel_id"]
+        actual = list(test_data.transactions.columns)
+        self.assertEqual(expected, actual)

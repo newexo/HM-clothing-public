@@ -10,7 +10,7 @@ from hmcollab.tests.test_scoring import TestScoring
 from hmcollab.tests.test_transactions import TestTransactions
 
 # integration tests
-from hmcollab.tests.integration_tests.test_data_exists import TestDataExists
+from hmcollab.tests.integration_tests.test_data_exists import IntegrationTestDataExists
 
 
 class CountSuite(object):
@@ -36,7 +36,7 @@ def suite(integration):
 
     if integration:
         print("Running integration tests.")
-        s.add(TestDataExists)
+        s.add(IntegrationTestDataExists)
 
     return s.s
 
