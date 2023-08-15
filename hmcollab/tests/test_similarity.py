@@ -12,6 +12,7 @@ from hmcollab.similarity import (
 )
 
 
+# TODO: replace these tests with unit tests
 class TestSimilarity(unittest.TestCase):
     def setUp(self):
         self.tree = HMDatasetDirectoryTree(base=directories.testdata())

@@ -13,6 +13,7 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 
 
+# TODO: replace these tests with integration tests depending on data in testdata/fivehundred
 class TestModels(unittest.TestCase):
     def setUp(self):
         self.tree = HMDatasetDirectoryTree(base=directories.testdata("ten_customers"))
@@ -182,11 +183,29 @@ class TestModels(unittest.TestCase):
         )
 
         # originally, prediction failed for all. Fix so that one recommendation is correct to test ap_at_k and map_at_k
-        actual_recommend_all.prediction = actual_recommend_all.iloc[0].prediction.replace("0811835004", "0794321007")
+        actual_recommend_all.prediction = actual_recommend_all.iloc[
+            0
+        ].prediction.replace("0811835004", "0794321007")
         t = scoring.relevant(actual_recommend_all, y_by_customer)
         self.assertEqual((1,), t.shape)
         self.assertEqual((12,), t[0].shape)
-        self.assertEqual([False, False, True, False, False, False, False, False, False, False, False, False], list(t[0]))
+        self.assertEqual(
+            [
+                False,
+                False,
+                True,
+                False,
+                False,
+                False,
+                False,
+                False,
+                False,
+                False,
+                False,
+                False,
+            ],
+            list(t[0]),
+        )
 
         self.assertAlmostEquals(0.027777777777777776, scoring.ap_at_k(t[0]))
         self.assertAlmostEquals(0.027777777777777776, scoring.map_at_k(t))

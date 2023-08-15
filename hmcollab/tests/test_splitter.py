@@ -10,6 +10,7 @@ from hmcollab import directories
 from hmcollab import splitter
 
 
+# TODO: replace these tests with unit tests
 class TestSplitter(unittest.TestCase):
     def setUp(self):
         self.tree = HMDatasetDirectoryTree(
@@ -88,9 +89,7 @@ class TestSplitter(unittest.TestCase):
             "0768847001",
             "0568601043",
         }
-        pruned_articles = prune_articles(
-            self.dataset.articles, article_ids=article_ids
-        )
+        pruned_articles = prune_articles(self.dataset.articles, article_ids=article_ids)
         expected = article_ids
         actual = set(pruned_articles.article_id.unique())
         self.assertEqual(expected, actual)
