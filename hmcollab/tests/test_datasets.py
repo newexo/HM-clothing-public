@@ -7,6 +7,14 @@ from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab import datasets
 from hmcollab import directories
 
+# Most tests are based on the Kaggle dataset and need to be replaced
+# The test are either to test a a) class/function or b) check the
+# structure of the dataset. For b) some test can stay (column names, etc)
+# but others look for specific records and need to be replaced or removed
+# datasets tested are: articles, transactions, target_vs_last7d, forty_dataset
+#                      forty_dataset, tests/testdata, 
+#                      standard, twosets and threesets splits
+# We need to revise how to handle preloaded target and relevant sets
 
 class TestDatasets(unittest.TestCase):
     def setUp(self):
@@ -24,6 +32,7 @@ class TestDatasets(unittest.TestCase):
     def tearDown(self):
         pass
 
+# TODO: Need to make data agnostic
     def test_directory_tree(self):
         tree = HMDatasetDirectoryTree(base="base")
         expected = "base"
@@ -54,10 +63,12 @@ class TestDatasets(unittest.TestCase):
         actual = HMDatasetDirectoryTree().path()
         self.assertEqual(expected, actual)
 
+# OK
     def test_trees_directories_exist(self):
         self.assertTrue(os.path.isdir(self.tree.path()))
         self.assertTrue(os.path.isdir(self.tree.images()))
 
+# TODO: Need to make data agnostic
     def test_tree_files_exist(self):
         self.assertTrue(os.path.exists(self.tree.articles))
         self.assertTrue(os.path.exists(self.tree.customers))
@@ -65,6 +76,7 @@ class TestDatasets(unittest.TestCase):
         self.assertTrue(os.path.exists(self.tree.image("1234567890")))
         self.assertTrue(os.path.exists(self.tree.image("5678901234")))
 
+# OK
     def test_articles(self):
         expected = [
             "article_id",
@@ -97,26 +109,31 @@ class TestDatasets(unittest.TestCase):
         self.assertEqual(expected, actual)
         self.assertEqual(110, self.dataset.articles.shape[0])
 
+# TODO: Need to make data agnostic
     def test_article_id(self):
         expected = "0110065001"
         actual = self.dataset.articles.iloc[0].article_id
         self.assertEqual(expected, actual)
 
+# TODO: Need to make data agnostic
     def test_transaction_article_id(self):
         expected = "0110065001"
         actual = self.dataset.transactions.iloc[0].article_id
         self.assertEqual(expected, actual)
 
+# TODO: Need to make data agnostic
     def test_product_code(self):
         expected = "0110065"
         actual = self.dataset.articles.iloc[0].product_code
         self.assertEqual(expected, actual)
 
+# TODO: Need to make data agnostic
     def test_colour_group_code(self):
         expected = "09"
         actual = self.dataset.articles.iloc[0].colour_group_code
         self.assertEqual(expected, actual)
 
+# OK
     def test_customers(self):
         expected = [
             "customer_id",
@@ -131,18 +148,21 @@ class TestDatasets(unittest.TestCase):
         self.assertEqual(expected, actual)
         self.assertEqual(5, self.dataset.customers.shape[0])
 
+# OK
     def test_transactions(self):
         expected = ["t_dat", "customer_id", "article_id", "price", "sales_channel_id"]
         actual = list(self.dataset.transactions.columns)
         self.assertEqual(expected, actual)
         self.assertEqual(120, self.dataset.transactions.shape[0])
 
+# TODO We might want to rethink this test
     def test_target_vs_last7d(self):
         # Target dataset should have column target rather than column last7d
         df = pd.read_csv(directories.data("target_set_7d_75481u.csv"), nrows=20)
         self.assertNotIn("last_7d", df.columns)
         self.assertIn("target", df.columns)
 
+# OK
     def test_transactions_x_y_r(self):
         actual = self.x_y_r.transactions_x.shape[0] + self.x_y_r.transactions_y.shape[0]
         expected = self.dataset.transactions.shape[0]
@@ -161,12 +181,15 @@ class TestDatasets(unittest.TestCase):
         actual = relevant.shape
         self.assertEqual(expected, actual)
 
+# TODO: Need to make data agnostic
         a_customer = "00000dbacae5abe5e23885899a1fa44253a17956c6d1c3d25f88aa139fdfc657"
         relevant_slow = datasets.TargetSlow(self.dataset.transactions).relevant_set
         expected = relevant_slow.loc[relevant_slow.customer_id == a_customer, "target"]
         actual = relevant.loc[relevant.customer_id == a_customer, "target"]
         self.assertEqual(expected.values, actual.values)
 
+# TODO Some OK. Should we simplify the others?
+# relevant set was generated and preloaded. Remove?
     def test_relevant(self):
         expected = ["customer_id", "target"]
         actual = list(self.dataset.relevant_set.columns)
@@ -180,6 +203,7 @@ class TestDatasets(unittest.TestCase):
         actual = list(self.dataset.relevant_set.target)
         self.assertEqual(expected, actual)
 
+# TODO Some OK but most need to be replaced with synthetic test data
     def test_forty_more_relevant(self):
         expected = ["customer_id", "target"]
         actual = list(self.forty_dataset.relevant_set.columns)
@@ -193,6 +217,7 @@ class TestDatasets(unittest.TestCase):
         actual = list(self.forty_dataset.relevant_set.target)
         self.assertEqual(expected, actual)
 
+# TODO Some OK but most need to be replaced with synthetic test data    
     def test_toy(self):
         dataset = datasets.HMDataset(tree=self.forty_tree, toy=True)
         expected = (120, 5)
@@ -210,6 +235,7 @@ class TestDatasets(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
+# TODO Easy to fix but will need updating after test data is re-generated
     def test_forty_more(self):
         expected = (53, 7)
         actual = self.forty_dataset.customers.shape
@@ -239,6 +265,7 @@ class TestDatasets(unittest.TestCase):
         actual = self.forty_dataset.train_y.shape
         self.assertEqual(expected, actual)
 
+# TODO Easy to fix but will need updating after test data is re-generated
     def test_twosets(self):
         ds = datasets.HMDataset(tree=self.larger_tree, folds="twosets")
         expected = (46, 5)
@@ -257,6 +284,7 @@ class TestDatasets(unittest.TestCase):
         actual = ds.train_x.shape
         self.assertEqual(expected, actual)
 
+# TODO Most easy to fix with updating. Others need to use synthetic data
     def test_x_y(self):
         ds = datasets.HMDataset(tree=self.larger_tree, folds="twosets")
 
@@ -288,6 +316,7 @@ class TestDatasets(unittest.TestCase):
         actual = ds.transactions_y.iloc[100].to_dict()
         self.assertEqual(expected, actual)
 
+# TODO Most easy to fix with updating. Others need to use synthetic data
     def test_threesets(self):
         ds = datasets.HMDataset(tree=self.larger_tree, folds="threesets")
         expected = (46, 5)
@@ -374,6 +403,7 @@ class TestDatasets(unittest.TestCase):
         actual = ds.val_x.iloc[200].to_dict()
         self.assertEqual(expected, actual)
 
+# TODO Most easy to fix with updating. Others need to use synthetic data
     def test_standard(self):
         ds = datasets.HMDataset(tree=self.larger_tree, folds="standard")
         expected = (4776, 5)
