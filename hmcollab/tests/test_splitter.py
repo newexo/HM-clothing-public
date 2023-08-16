@@ -11,6 +11,7 @@ from hmcollab import splitter
 
 
 # TODO: replace these tests with unit tests
+# Many of these tests depend only on the fields by which we are splitting and no other fields
 class TestSplitter(unittest.TestCase):
     def setUp(self):
         self.tree = HMDatasetDirectoryTree(
@@ -25,6 +26,7 @@ class TestSplitter(unittest.TestCase):
     def tearDown(self):
         pass
 
+    # TODO: replace with a unit test based on a random dataframe
     def test_split_by_time(self):
         expected = self.dataset.transactions.iloc[0].t_dat
         older, newer = splitter.split_by_time(self.dataset.transactions, days=20)
@@ -47,6 +49,7 @@ class TestSplitter(unittest.TestCase):
         cutoff_date = new_max - datetime.timedelta(days=20)
         self.assertLess(old_max, cutoff_date)
 
+    # TODO: replace with a unit test based on a random dataframe
     def test_older_newer_portions_transactions(self):
         op = splitter.OlderPortion(20).split(self.dataset)
         np = splitter.NewerPortion(20).split(self.dataset)
@@ -69,6 +72,7 @@ class TestSplitter(unittest.TestCase):
         cutoff_date = new_max - datetime.timedelta(days=20)
         self.assertLess(old_max, cutoff_date)
 
+    # TODO: replace with a unit test based on a random dataframe
     def test_prune_customers(self):
         customer_ids = {
             "bed6979e4c947ad451fad7235ffab1e61ad95517e8cf26cb9e9d68a4decc9b5f",
@@ -82,6 +86,7 @@ class TestSplitter(unittest.TestCase):
         actual = set(pruned_customers.customer_id.unique())
         self.assertEqual(expected, actual)
 
+    # TODO: replace with a unit test based on a random dataframe, also consider that this may be covered
     def test_prune_articles(self):
         article_ids = {
             "0456163085",
@@ -94,6 +99,7 @@ class TestSplitter(unittest.TestCase):
         actual = set(pruned_articles.article_id.unique())
         self.assertEqual(expected, actual)
 
+    # TODO: replace with a unit test based on a random dataframe
     def test_split_by_ids(self):
         full_ids = self.dataset.customers.customer_id.unique()
         full_ids = set(full_ids)
@@ -117,6 +123,7 @@ class TestSplitter(unittest.TestCase):
         union = actual.union(ids_train)
         self.assertEqual(full_ids, union)
 
+    # TODO: replace with a unit test based on a random dataframe
     def test_transactions_train_test(self):
         ids_train, ids_test = splitter.split_ids(self.dataset.customers, 0.2)
         train, test = splitter.transactions_train_test(
@@ -134,6 +141,7 @@ class TestSplitter(unittest.TestCase):
         actual = set(train.customer_id.unique())
         self.assertEqual(expected, actual)
 
+    # TODO: replace with a simpler test
     def test_customer_portion(self):
         all_customer_ids = self.dataset.customers.customer_id.unique()
         r = np.random.RandomState(42)
@@ -164,6 +172,7 @@ class TestSplitter(unittest.TestCase):
         actual = set(ds.transactions.article_id.unique())
         self.assertEqual(expected, actual)
 
+    # TODO: consider replacing with a simpler test
     def test_split_by_customer_train_test_strategy_default(self):
         strategy = splitter.SplitByCustomerTrainTestStrategy(self.dataset, 0.2)
         full_ids = self.dataset.customers.customer_id.unique()
@@ -238,6 +247,7 @@ class TestSplitter(unittest.TestCase):
         union = set(ids_test).union(ids_train)
         self.assertEqual(full_ids, union)
 
+    # TODO: we do not need an integration test for this
     def test_split_by_customer_train_test_strategy(self):
         strategy = splitter.SplitByCustomerTrainTestStrategy(
             self.dataset, 0.1, random_state=np.random.RandomState(48)
@@ -261,6 +271,7 @@ class TestSplitter(unittest.TestCase):
         actual = set(ids_test)
         self.assertNotEqual(expected, actual)
 
+    # TODO: we do not need an integration test for this
     def test_split_by_customer_train_test_validation_strategy_default(self):
         strategy = splitter.SplitByCustomerTrainTestValidationStrategy(
             self.dataset, 0.2, 0.2
@@ -333,6 +344,7 @@ class TestSplitter(unittest.TestCase):
         actual = valid_ids
         self.assertEqual(expected, actual)
 
+    # TODO: we do not need an integration test for this
     def test_split_by_customer_train_test_validation_strategy(self):
         strategy = splitter.SplitByCustomerTrainTestValidationStrategy(
             self.dataset, 0.1, 0.05, random_state=np.random.RandomState(48)
@@ -358,6 +370,7 @@ class TestSplitter(unittest.TestCase):
         }
         self.assertEqual(expected, actual)
 
+    # TODO: we do not need an integration test for this
     def test_xy_strategy(self):
         strategy = splitter.XYStrategy(self.larger_dataset, 7)
 
@@ -389,6 +402,7 @@ class TestSplitter(unittest.TestCase):
         actual = strategy.y.transactions.iloc[100].to_dict()
         self.assertEqual(expected, actual)
 
+    # TODO: we do not need an integration test for this
     def test_standard_strategy(self):
         strategy = splitter.StandardStrategy(self.larger_dataset, 7)
 

@@ -57,6 +57,7 @@ class TestModels(unittest.TestCase):
         ]
         self.assertEqual(expected, actual)
 
+    # TODO: remove as duplicate
     def test_recommend_all(self):
         recommender = models.KnnRecommender(
             self.dataset,
@@ -84,6 +85,7 @@ class TestModels(unittest.TestCase):
         expected = "0726925001 0735843004 0715624008 0783388001"
         self.assertEqual(expected, actual)
 
+    # TODO: remove as duplicate
     def test_recommend_all_drop_duplicates(self):
         recommender = models.KnnRecommender(
             self.dataset,
@@ -111,6 +113,7 @@ class TestModels(unittest.TestCase):
         expected = "0726925001 0735843004 0715624008 0783388001"
         self.assertEqual(expected, actual)
 
+    # TODO: create new integration test based on this
     def test_recommend_all_drop_duplicates_with_threshold(self):
         recommender = models.KnnRecommender(
             self.dataset,

@@ -46,6 +46,8 @@ class Target:
         self.relevant_set.rename(columns={"index": "customer_id"}, inplace=True)
 
 
+# TODO: write unit test with random dataframes
+# TODO: consider writing an integration test
 def target_to_relevant(trans_y):
     """Convert to dataframe of customers with a list of transactions from the input set"""
 
