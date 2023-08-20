@@ -10,6 +10,16 @@ from hmcollab import articles
 from hmcollab import datasets
 from hmcollab import directories
 
+# The suite test the following:
+# + articles dataset and preprocessing such as:
+#   shape and one-hot encoding implementation
+#   Those tests can be replaced with unittest using 
+#   One-hot and indeces can be tested with a simple synthetic dataset
+#   consisting of a couple of categorical columns and a numerical index
+#   column with some IDS starting with 0
+# + Other are integration test testing results from KNN
+#    We might want to remove those and only keep integration test are models
+
 # just for testing
 def dummy_features(df, columns):
     # for articles
@@ -32,12 +42,16 @@ class TestArticles(unittest.TestCase):
     def tearDown(self):
         pass
 
+# TODO: Need synthetic data
     def get_simple(self):
         return articles.ArticleFeaturesSimpleFeatures(self.dataset.articles.iloc[:17])
 
+# TODO: Need synthetic data to test .x (dummies). A column with categorial might be enough
     def get_simple_knn(self):
         return hmcollab.models.ArticleKNN(self.get_simple().x, 4)
 
+# TODO: Some duplicated with test_use_article_ids
+# Keep but simplify. Convert to unittest (instead of integration)
     def test_article_simple_feature_array(self):
         a = self.get_simple()
         expected = (17, 65)
@@ -49,17 +63,21 @@ class TestArticles(unittest.TestCase):
         actual, _ = a.x.shape
         self.assertEqual(expected, actual)
 
+# Remove?
         # test that actual onehot values are the same as a previously saved example
         expected = self.simple_onehot
         actual = a.x.values
         self.assertEqual(0, norm(actual - expected))
 
+# TODO Replace using synthetic data with numerical indices 
+#       Make sure some of those indices start with 0
     def test_id_from_index(self):
         a = self.get_simple()
         expected = "0111586001"
         actual = a.id_from_index(2)
         self.assertEqual(expected, actual)
 
+# TODO: review if we want to keep this or only integration test at models
     def test_knn_by_row(self):
         knn = self.get_simple_knn()
         x = self.simple_onehot
@@ -78,6 +96,7 @@ class TestArticles(unittest.TestCase):
         actual = set(indices[0])
         self.assertEqual(expected, actual)
 
+# TODO: review if we want to keep this or only integration test at models
     def test_knn_by_index(self):
         a = self.get_simple()
         knn = self.get_simple_knn()
@@ -98,6 +117,7 @@ class TestArticles(unittest.TestCase):
         actual = set(indices[0])
         self.assertEqual(expected, actual)
 
+# TODO: Some duplicated from test_article_simple_feature_array
     def test_use_article_ids(self):
         features = [
             "product_type_no",
@@ -126,6 +146,7 @@ class TestArticles(unittest.TestCase):
         # test article ids are same
         self.assertEqual(list(expected.article_id), list(actual.article_id))
 
+# TODO: Remove?
     def test_one_of_each(self):
         # test load dataframe where each dummy has at least one non-zero entry
         munger = articles.ArticleFeaturesSimpleFeatures(
