@@ -12,6 +12,12 @@ from hmcollab import articles
 from hmcollab import transactions
 
 
+# This suit is data dependent
+# + split by time: Could use random dataset with dates to test. 
+#               We could simplify test_slit_by_time_first_six(self)
+# + creation of customer dummies: could use random set?
+# + test kmeans on transaction from single customer. Integration test?
+
 def kmeans_consumer_old(customer, transactions_df, full_articles_dummy, k=1):
     # Note: Do not scale dummy features
     basket = transactions.TransactionsByCustomer(transactions_df).all_article_ids(
@@ -52,6 +58,7 @@ class TestTransactions(unittest.TestCase):
         self.assertEqual(3, y.shape[0])
         self.assertEqual(3, x.shape[0])
 
+# TODO: Could use random dataset with dates to test. We could simplify
     def test_slit_by_time_first_six(self):
         six_transactions = self.dataset.transactions.iloc[:6].copy()
         x, y = hmcollab.splitter.split_by_time(six_transactions, self.days)
@@ -117,6 +124,7 @@ class TestTransactions(unittest.TestCase):
         expected = [1, 2, 1]
         self.assertEqual(expected, actual)
 
+# convert to unit test using random dataset with article_ids
     def test_all_article_ids(self):
         t = transactions.TransactionsByCustomer(self.dataset.transactions)
         actual = t.all_article_ids(self.customer)
@@ -130,6 +138,7 @@ class TestTransactions(unittest.TestCase):
         ]
         self.assertEqual(expected, actual)
 
+# TODO: psssible duplicates (test_articles.py)
     def test_customer_dummies(self):
         t = transactions.TransactionsByCustomer(self.dataset.transactions)
         basket = t.all_article_ids(self.customer)
@@ -151,6 +160,7 @@ class TestTransactions(unittest.TestCase):
         # test that dummy values are same
         self.assertEqual(0, norm(expected.values - actual.values))
 
+# TODO: remove?
     def test_kmeans_consumer(self):
         full_dummies = articles.ArticleFeaturesSimpleFeatures(
             self.dataset.articles, use_article_id=True
@@ -170,6 +180,7 @@ class TestTransactions(unittest.TestCase):
         ).cluster_centers_
         self.assertEqual(expected.tolist(), actual.tolist())
 
+# TODO: Important test. Think on integration test
     def test_kmeans_consumer_2(self):
         # Note: Do not scale dummy features
         full_dummies = articles.ArticleFeaturesSimpleFeatures(
