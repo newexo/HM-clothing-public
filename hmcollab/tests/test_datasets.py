@@ -1,11 +1,12 @@
 import unittest
-import os
-import pandas as pd
 from datetime import datetime
 
-from hmcollab.directory_tree import HMDatasetDirectoryTree
+import pandas as pd
+
 from hmcollab import datasets
 from hmcollab import directories
+from hmcollab.directory_tree import HMDatasetDirectoryTree
+
 
 # Most tests are based on the Kaggle dataset and need to be replaced
 # The test are either to test a a) class/function or b) check the
@@ -15,6 +16,7 @@ from hmcollab import directories
 #                      forty_dataset, tests/testdata, 
 #                      standard, twosets and threesets splits
 # We need to revise how to handle preloaded target and relevant sets
+
 
 class TestDatasets(unittest.TestCase):
     def setUp(self):
@@ -32,7 +34,6 @@ class TestDatasets(unittest.TestCase):
     def tearDown(self):
         pass
 
-# TODO: Need to make data agnostic
     def test_directory_tree(self):
         tree = HMDatasetDirectoryTree(base="base")
         expected = "base"
@@ -62,52 +63,6 @@ class TestDatasets(unittest.TestCase):
         expected = directories.data()
         actual = HMDatasetDirectoryTree().path()
         self.assertEqual(expected, actual)
-
-# OK
-    def test_trees_directories_exist(self):
-        self.assertTrue(os.path.isdir(self.tree.path()))
-        self.assertTrue(os.path.isdir(self.tree.images()))
-
-# TODO: Need to make data agnostic
-    def test_tree_files_exist(self):
-        self.assertTrue(os.path.exists(self.tree.articles))
-        self.assertTrue(os.path.exists(self.tree.customers))
-        self.assertTrue(os.path.exists(self.tree.transactions))
-        self.assertTrue(os.path.exists(self.tree.image("1234567890")))
-        self.assertTrue(os.path.exists(self.tree.image("5678901234")))
-
-# OK
-    def test_articles(self):
-        expected = [
-            "article_id",
-            "product_code",
-            "prod_name",
-            "product_type_no",
-            "product_type_name",
-            "product_group_name",
-            "graphical_appearance_no",
-            "graphical_appearance_name",
-            "colour_group_code",
-            "colour_group_name",
-            "perceived_colour_value_id",
-            "perceived_colour_value_name",
-            "perceived_colour_master_id",
-            "perceived_colour_master_name",
-            "department_no",
-            "department_name",
-            "index_code",
-            "index_name",
-            "index_group_no",
-            "index_group_name",
-            "section_no",
-            "section_name",
-            "garment_group_no",
-            "garment_group_name",
-            "detail_desc",
-        ]
-        actual = list(self.dataset.articles.columns)
-        self.assertEqual(expected, actual)
-        self.assertEqual(110, self.dataset.articles.shape[0])
 
 # TODO: Need to make data agnostic
     def test_article_id(self):

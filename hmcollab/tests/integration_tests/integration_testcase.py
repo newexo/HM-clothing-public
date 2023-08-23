@@ -1,6 +1,6 @@
-from unittest import TestCase
 import hashlib
 import json
+from unittest import TestCase
 
 
 class IntegrationTestCase(TestCase):

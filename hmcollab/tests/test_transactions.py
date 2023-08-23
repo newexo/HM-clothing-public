@@ -1,15 +1,14 @@
 import unittest
 
-from numpy.linalg import norm
-from sklearn.cluster import KMeans
 import pandas as pd
+from sklearn.cluster import KMeans
 
-from hmcollab.directory_tree import HMDatasetDirectoryTree
 import hmcollab.splitter
+from hmcollab import articles
 from hmcollab import datasets
 from hmcollab import directories
-from hmcollab import articles
 from hmcollab import transactions
+from hmcollab.directory_tree import HMDatasetDirectoryTree
 
 
 # This suit is data dependent
@@ -137,48 +136,6 @@ class TestTransactions(unittest.TestCase):
             "0877274003",
         ]
         self.assertEqual(expected, actual)
-
-# TODO: psssible duplicates (test_articles.py)
-    def test_customer_dummies(self):
-        t = transactions.TransactionsByCustomer(self.dataset.transactions)
-        basket = t.all_article_ids(self.customer)
-        full_articles_dummy = self.articles_munger.x
-        customer_dummies = full_articles_dummy.merge(
-            basket, on="article_id", how="inner"
-        ).drop(columns="article_id")
-
-        self.assertEqual(
-            len(self.articles_munger.x.columns) - 1, len(customer_dummies.columns)
-        )
-
-        actual = t.customer_dummies(self.customer, full_articles_dummy)
-        expected = customer_dummies
-
-        # test that columns are same
-        self.assertEqual(list(expected.columns), list(actual.columns))
-
-        # test that dummy values are same
-        self.assertEqual(0, norm(expected.values - actual.values))
-
-# TODO: remove?
-    def test_kmeans_consumer(self):
-        full_dummies = articles.ArticleFeaturesSimpleFeatures(
-            self.dataset.articles, use_article_id=True
-        ).x
-        t = transactions.TransactionsByCustomer(self.dataset.transactions)
-        customer_dummies = t.customer_dummies(self.customer, full_dummies)
-        kmeans = KMeans(
-            init="k-means++",
-            n_clusters=self.clusters,
-            n_init=10,
-            max_iter=300,
-            random_state=42,
-        ).fit(customer_dummies)
-        expected = kmeans.cluster_centers_
-        actual = kmeans_consumer_old(
-            self.customer, self.dataset.transactions, full_dummies, k=self.clusters
-        ).cluster_centers_
-        self.assertEqual(expected.tolist(), actual.tolist())
 
 # TODO: Important test. Think on integration test
     def test_kmeans_consumer_2(self):

@@ -1,14 +1,14 @@
 import unittest
+import warnings
 
-from hmcollab.directory_tree import HMDatasetDirectoryTree
+import pandas as pd
+
+from hmcollab import articles
 from hmcollab import datasets
 from hmcollab import directories
-from hmcollab import articles
 from hmcollab import models
 from hmcollab import scoring
-
-import warnings
-import pandas as pd
+from hmcollab.directory_tree import HMDatasetDirectoryTree
 
 warnings.filterwarnings("ignore")
 
@@ -55,62 +55,6 @@ class TestModels(unittest.TestCase):
             "0783388001",
             "0377277001",
         ]
-        self.assertEqual(expected, actual)
-
-    # TODO: remove as duplicate
-    def test_recommend_all(self):
-        recommender = models.KnnRecommender(
-            self.dataset,
-            self.full_dummies,
-            groups=2,
-            total_recommendations=4,
-            threshold=0,
-        )
-        df = recommender.recommend_all(self.customer_list, drop_duplicates=False)
-
-        actual = df.shape
-        expected = (2, 2)
-        self.assertEqual(expected, actual)
-
-        actual = len(df.prediction[0].split(" "))
-        expected = 4
-        self.assertEqual(expected, actual)
-
-        actual = df.prediction[0]
-
-        expected = "0351484002 0663713001 0870304002 0578020002"
-        self.assertEqual(expected, actual)
-
-        actual = df.prediction[1]
-        expected = "0726925001 0735843004 0715624008 0783388001"
-        self.assertEqual(expected, actual)
-
-    # TODO: remove as duplicate
-    def test_recommend_all_drop_duplicates(self):
-        recommender = models.KnnRecommender(
-            self.dataset,
-            self.full_dummies,
-            groups=2,
-            total_recommendations=4,
-            threshold=0,
-        )
-        df = recommender.recommend_all(self.customer_list, drop_duplicates=True)
-
-        actual = df.shape
-        expected = (2, 2)
-        self.assertEqual(expected, actual)
-
-        actual = len(df.prediction[0].split(" "))
-        expected = 4
-        self.assertEqual(expected, actual)
-
-        actual = df.prediction[0]
-
-        expected = "0351484002 0723529001 0727808001 0852643001"
-        self.assertEqual(expected, actual)
-
-        actual = df.prediction[1]
-        expected = "0726925001 0735843004 0715624008 0783388001"
         self.assertEqual(expected, actual)
 
     # TODO: create new integration test based on this

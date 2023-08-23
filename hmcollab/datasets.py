@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 import hmcollab.splitter
 from .directory_tree import HMDatasetDirectoryTree

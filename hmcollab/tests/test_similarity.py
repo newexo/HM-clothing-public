@@ -1,8 +1,8 @@
 import unittest
 
-from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab import datasets
 from hmcollab import directories
+from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab.similarity import (
     IdenticalSimilarity,
     DepartmentSimilarity,

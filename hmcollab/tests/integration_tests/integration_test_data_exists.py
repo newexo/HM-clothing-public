@@ -1,8 +1,8 @@
 import os
 
 from hmcollab import directories
-from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab.datasets import HMDataset
+from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab.tests.integration_tests.integration_testcase import IntegrationTestCase
 
 
