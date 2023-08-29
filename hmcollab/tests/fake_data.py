@@ -44,3 +44,26 @@ def dates_random(n_month=50, r=None):
             ]
             dates.extend(temp)
     return dates
+
+
+def transactions_random_df(customer_df, articles_df, n=100, r=None):
+    if r is None:
+        r = np.random.RandomState(42)
+    customer_ids = r.choice(articles_df.article_id.unique(), size=n)
+    article_ids = r.choice(customer_df.customer_id.unique(), size=n)
+    dates = dates_random(n_month=n, r=r)
+    r.shuffle(dates)
+    dates = dates[:n]
+    prices = r.rand(n)
+    sales_channels = r.choice([1, 2], size=n)
+    df = pd.DataFrame.from_dict(
+        {
+            "t_dat": dates,
+            "customer_id": customer_ids,
+            "article_id": article_ids,
+            "price": prices,
+            "sales_channel_id": sales_channels,
+        }
+    )
+    df.t_dat = pd.to_datetime(df.t_dat)
+    return df
