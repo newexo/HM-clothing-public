@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
 
+from hmcollab import three_part_dataset
+from hmcollab.articles import ArticleFeatureMunger
+
 
 def customer_id(i):
     return f"0{i:x}"
@@ -67,3 +70,12 @@ def transactions_random_df(customer_df, articles_df, n=100, r=None):
     )
     df.t_dat = pd.to_datetime(df.t_dat)
     return df
+
+
+def random_dataset(n_customers=100, n_articles=100, n_transactions=1000, r=None):
+    if r is None:
+        r = np.random.RandomState(42)
+    customers = fake_customers(n_customers, r=r)
+    articles = articles_random_df(n_articles, r=r)
+    transactions = transactions_random_df(customers, articles, n_transactions, r=r)
+    return three_part_dataset.ThreePartDataset(articles, customers, transactions)
