@@ -5,10 +5,10 @@ from hmcollab import directories
 from hmcollab.directory_tree import HMDatasetDirectoryTree
 from hmcollab.similarity import (
     IdenticalSimilarity,
-    DepartmentSimilarity,
-    ProductCodeSimilarity,
-    ColourGroupCodeSimilarity,
-    GarmentGroupNoSimilarity,
+    DepartmentSimilarityByColumn,
+    ProductCodeSimilarityByColumn,
+    ColourGroupCodeSimilarityByColumn,
+    GarmentGroupNoSimilarityByColumn,
     get_similarity,
 )
 
@@ -28,7 +28,7 @@ class TestSimilarity(unittest.TestCase):
         pass
 
     def get_department_similarity(self):
-        return DepartmentSimilarity(self.dataset.articles)
+        return DepartmentSimilarityByColumn(self.dataset.articles)
 
     def test_identity_similarity(self):
         sim = IdenticalSimilarity()
@@ -181,7 +181,7 @@ class TestSimilarity(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_product_code_similarity(self):
-        sim = ProductCodeSimilarity(self.dataset.articles)
+        sim = ProductCodeSimilarityByColumn(self.dataset.articles)
         i = "0118458038"
         j = "0118458039"
         row_i = sim.row_from_article_id(i)
@@ -190,7 +190,7 @@ class TestSimilarity(unittest.TestCase):
         self.assertTrue(sim.similarity(i, j))
 
     def test_colour_group_code_similarity(self):
-        sim = ColourGroupCodeSimilarity(self.dataset.articles)
+        sim = ColourGroupCodeSimilarityByColumn(self.dataset.articles)
         i = "0887593002"
         j = "0611584007"
         row_i = sim.row_from_article_id(i)
@@ -199,7 +199,7 @@ class TestSimilarity(unittest.TestCase):
         self.assertTrue(sim.similarity(i, j))
 
     def test_garment_group_no_similarity(self):
-        sim = GarmentGroupNoSimilarity(self.dataset.articles)
+        sim = GarmentGroupNoSimilarityByColumn(self.dataset.articles)
         i = "0866383001"
         j = "0599580055"
         row_i = sim.row_from_article_id(i)

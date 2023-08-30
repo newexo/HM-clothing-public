@@ -27,17 +27,10 @@ class IdenticalSimilarity(Similarity):
         return np.isin(predicted, target)
 
 
-class ArticleSimilarity(Similarity, metaclass=ABCMeta):
-    def __init__(self, df):
+class ArticleSimilarityByColumn(Similarity):
+    def __init__(self, df, column_name):
         self.df = df
-
-    @abstractmethod
-    def _column_name(self):
-        pass
-
-    @property
-    def column_name(self):
-        return self._column_name()
+        self.column_name = column_name
 
     def row_from_article_id(self, id0):
         df = self.df[self.df.article_id == id0]
@@ -62,34 +55,34 @@ class ArticleSimilarity(Similarity, metaclass=ABCMeta):
         return row0[self.column_name] == row1[self.column_name]
 
 
-class DepartmentSimilarity(ArticleSimilarity):
-    def _column_name(self):
-        return "department_no"
+class DepartmentSimilarityByColumn(ArticleSimilarityByColumn):
+    def __init__(self, df):
+        super().__init__(df, "department_no")
 
 
-class ProductCodeSimilarity(ArticleSimilarity):
-    def _column_name(self):
-        return "product_code"
+class ProductCodeSimilarityByColumn(ArticleSimilarityByColumn):
+    def __init__(self, df):
+        super().__init__(df, "product_code")
 
 
-class ColourGroupCodeSimilarity(ArticleSimilarity):
-    def _column_name(self):
-        return "colour_group_code"
+class ColourGroupCodeSimilarityByColumn(ArticleSimilarityByColumn):
+    def __init__(self, df):
+        super().__init__(df, "colour_group_code")
 
 
-class GarmentGroupNoSimilarity(ArticleSimilarity):
-    def _column_name(self):
-        return "garment_group_no"
+class GarmentGroupNoSimilarityByColumn(ArticleSimilarityByColumn):
+    def __init__(self, df):
+        super().__init__(df, "garment_group_no")
 
 
 def get_similarity(similarity_name, articles_df):
     if similarity_name == "product_code":
-        return ProductCodeSimilarity(articles_df)
+        return ProductCodeSimilarityByColumn(articles_df)
     elif similarity_name == "colour_group_code":
-        return ColourGroupCodeSimilarity(articles_df)
+        return ColourGroupCodeSimilarityByColumn(articles_df)
     elif similarity_name == "department_no":
-        return DepartmentSimilarity(articles_df)
+        return DepartmentSimilarityByColumn(articles_df)
     elif similarity_name == "garment_group_no":
-        return GarmentGroupNoSimilarity(articles_df)
+        return GarmentGroupNoSimilarityByColumn(articles_df)
 
     return IdenticalSimilarity()
