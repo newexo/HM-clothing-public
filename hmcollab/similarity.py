@@ -31,6 +31,14 @@ class ArticleSimilarity(Similarity, metaclass=ABCMeta):
     def __init__(self, df):
         self.df = df
 
+    @abstractmethod
+    def _column_name(self):
+        pass
+
+    @property
+    def column_name(self):
+        return self._column_name()
+
     def row_from_article_id(self, id0):
         df = self.df[self.df.article_id == id0]
         if df.shape[0]:
@@ -50,29 +58,28 @@ class ArticleSimilarity(Similarity, metaclass=ABCMeta):
         row1 = self.df.iloc[index1]
         return self.similarity_by_row(row0, row1)
 
-    @abstractmethod
     def similarity_by_row(self, row0, row1):
-        pass
+        return row0[self.column_name] == row1[self.column_name]
 
 
 class DepartmentSimilarity(ArticleSimilarity):
-    def similarity_by_row(self, row0, row1):
-        return row0.department_no == row1.department_no
+    def _column_name(self):
+        return "department_no"
 
 
 class ProductCodeSimilarity(ArticleSimilarity):
-    def similarity_by_row(self, row0, row1):
-        return row0.product_code == row1.product_code
+    def _column_name(self):
+        return "product_code"
 
 
 class ColourGroupCodeSimilarity(ArticleSimilarity):
-    def similarity_by_row(self, row0, row1):
-        return row0.colour_group_code == row1.colour_group_code
+    def _column_name(self):
+        return "colour_group_code"
 
 
 class GarmentGroupNoSimilarity(ArticleSimilarity):
-    def similarity_by_row(self, row0, row1):
-        return row0.garment_group_no == row1.garment_group_no
+    def _column_name(self):
+        return "garment_group_no"
 
 
 def get_similarity(similarity_name, articles_df):

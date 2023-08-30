@@ -9,6 +9,7 @@ from hmcollab.similarity import (
     ProductCodeSimilarity,
     ColourGroupCodeSimilarity,
     GarmentGroupNoSimilarity,
+    get_similarity,
 )
 
 
@@ -205,3 +206,19 @@ class TestSimilarity(unittest.TestCase):
         row_j = sim.row_from_article_id(j)
         self.assertEqual(row_i.garment_group_no, row_j.garment_group_no)
         self.assertTrue(sim.similarity(i, j))
+
+    def test_get_similarity(self):
+        sim = get_similarity("product_code", None)
+        self.assertEqual("product_code", sim.column_name)
+
+        sim = get_similarity("colour_group_code", None)
+        self.assertEqual("colour_group_code", sim.column_name)
+
+        sim = get_similarity("department_no", None)
+        self.assertEqual("department_no", sim.column_name)
+
+        sim = get_similarity("garment_group_no", None)
+        self.assertEqual("garment_group_no", sim.column_name)
+
+        sim = get_similarity("not a similarity", None)
+        self.assertIsInstance(sim, IdenticalSimilarity)
