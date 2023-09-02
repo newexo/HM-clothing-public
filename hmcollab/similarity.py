@@ -55,28 +55,13 @@ class ArticleSimilarityByColumn(Similarity):
         return row0[self.column_name] == row1[self.column_name]
 
 
-class DepartmentSimilarityByColumn(ArticleSimilarityByColumn):
-    def __init__(self, df):
-        super().__init__(df, "department_no")
-
-
-class ProductCodeSimilarityByColumn(ArticleSimilarityByColumn):
-    def __init__(self, df):
-        super().__init__(df, "product_code")
-
-
-class ColourGroupCodeSimilarityByColumn(ArticleSimilarityByColumn):
-    def __init__(self, df):
-        super().__init__(df, "colour_group_code")
-
-
-class GarmentGroupNoSimilarityByColumn(ArticleSimilarityByColumn):
-    def __init__(self, df):
-        super().__init__(df, "garment_group_no")
-
-
 def get_similarity(similarity_name, articles_df):
-    if similarity_name in ["product_code", "colour_group_code", "department_no", "garment_group_no"]:
+    if similarity_name in [
+        "product_code",
+        "colour_group_code",
+        "department_no",
+        "garment_group_no",
+    ]:
         return ArticleSimilarityByColumn(articles_df, similarity_name)
 
     return IdenticalSimilarity()
