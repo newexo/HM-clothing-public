@@ -52,8 +52,8 @@ def dates_random(n_month=50, r=None):
 def transactions_random_df(customer_df, articles_df, n=100, r=None):
     if r is None:
         r = np.random.RandomState(42)
-    customer_ids = r.choice(articles_df.article_id.unique(), size=n)
-    article_ids = r.choice(customer_df.customer_id.unique(), size=n)
+    article_ids = r.choice(articles_df.article_id.unique(), size=n)
+    customer_ids = r.choice(customer_df.customer_id.unique(), size=n)
     dates = dates_random(n_month=n, r=r)
     r.shuffle(dates)
     dates = dates[:n]

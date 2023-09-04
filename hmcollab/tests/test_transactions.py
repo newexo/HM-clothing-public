@@ -5,59 +5,22 @@ from sklearn.cluster import KMeans
 
 import hmcollab.splitter
 from hmcollab import articles
-from hmcollab import datasets
-from hmcollab import directories
 from hmcollab import transactions
-from hmcollab.directory_tree import HMDatasetDirectoryTree
 
-
-# This suit is data dependent
-# + split by time: Could use random dataset with dates to test. 
-#               We could simplify test_slit_by_time_first_six(self)
-# + creation of customer dummies: could use random set?
-# + test kmeans on transaction from single customer. Integration test?
-
-def kmeans_consumer_old(customer, transactions_df, full_articles_dummy, k=1):
-    # Note: Do not scale dummy features
-    basket = transactions.TransactionsByCustomer(transactions_df).all_article_ids(
-        customer
-    )
-    customer_dummies = full_articles_dummy.merge(
-        basket, on="article_id", how="inner"
-    ).drop(columns="article_id")
-    kmeans = KMeans(
-        init="k-means++", n_clusters=k, n_init=10, max_iter=300, random_state=42
-    )
-    return kmeans.fit(customer_dummies)
+from hmcollab.tests import fake_data
 
 
 class TestTransactions(unittest.TestCase):
     def setUp(self):
-        self.tree = hmcollab.directory_tree.HMDatasetDirectoryTree(
-            base=directories.testdata()
-        )
-        self.dataset = datasets.HMDataset(tree=self.tree)
-        self.articles_munger = articles.ArticleFeaturesSimpleFeatures(
-            self.dataset.articles, use_article_id=True
-        )
-        self.customer = (
-            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0"
-        )
+        self.customer = "05a"
         self.clusters = 2
         self.days = 7
+
+        self.dataset = fake_data.random_dataset()
 
     def tearDown(self):
         pass
 
-    def test_split_by_time(self):
-        # so far we are testing the number of rows after the split
-        # TODO: expand
-        six_transactions = self.dataset.transactions.iloc[:6].copy()
-        y, x = hmcollab.splitter.split_by_time(six_transactions, self.days)
-        self.assertEqual(3, y.shape[0])
-        self.assertEqual(3, x.shape[0])
-
-# TODO: Could use random dataset with dates to test. We could simplify
     def test_slit_by_time_first_six(self):
         six_transactions = self.dataset.transactions.iloc[:6].copy()
         x, y = hmcollab.splitter.split_by_time(six_transactions, self.days)
@@ -72,77 +35,80 @@ class TestTransactions(unittest.TestCase):
 
         # verify timestamps
         actual = list(y.t_dat)
-        expected = [pd.Timestamp(year=2020, month=8, day=19)] * 3
+        expected = [
+            pd.Timestamp(year=2022, month=3, day=25),
+            pd.Timestamp(year=2022, month=3, day=23),
+        ]
         self.assertEqual(expected, actual)
 
         actual = list(x.t_dat)
-        expected = [pd.Timestamp(year=2018, month=9, day=20)] * 3
+        expected = [
+            pd.Timestamp(year=2021, month=4, day=25),
+            pd.Timestamp(year=2021, month=4, day=3),
+            pd.Timestamp(year=2021, month=4, day=25),
+            pd.Timestamp(year=2021, month=3, day=14),
+        ]
         self.assertEqual(expected, actual)
 
         # verify customer ids
         actual = list(y.customer_id)
-        expected = [
-            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
-            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
-            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
-        ]
+        expected = ["010", "02a"]
         self.assertEqual(expected, actual)
 
         actual = list(x.customer_id)
-        expected = [
-            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
-            "18cfbd899a5f5f3b4bc0a0430104e0fd436c9fb10402eb184d95582a9f59d8b3",
-            "08f60b0c07fc14fffc8983aec045c80ede7a419793046375a7ef75b6a18afdf0",
-        ]
+        expected = ["05a", "021", "05a", "03a"]
         self.assertEqual(expected, actual)
 
         # verify article ids
         actual = list(y.article_id)
-        expected = ["0907534001", "0871517002", "0877274003"]
+        expected = ["015", "089"]
         self.assertEqual(expected, actual)
 
         actual = list(x.article_id)
-        expected = ["0110065001", "0111586001", "0531697003"]
+        expected = ["041", "098", "06", "059"]
         self.assertEqual(expected, actual)
 
         # verify price
         actual = list(y.price)
-        expected = [0.0254067796610168, 0.0254067796610168, 0.0338813559322033]
+        expected = [0.09468099050479506, 0.032856697740396346]
         self.assertEqual(expected, actual)
 
         actual = list(x.price)
-        expected = [0.022864406779661, 0.0127796610169491, 0.022864406779661]
+        expected = [
+            0.28816452288395134,
+            0.6039204436622274,
+            0.049593508220086124,
+            0.49916983326266173,
+        ]
         self.assertEqual(expected, actual)
 
         # verify sales channel id
         actual = list(y.sales_channel_id)
-        expected = [1, 1, 1]
+        expected = [1, 2]
         self.assertEqual(expected, actual)
 
         actual = list(x.sales_channel_id)
-        expected = [1, 2, 1]
+        expected = [1, 1, 1, 1]
         self.assertEqual(expected, actual)
 
-# convert to unit test using random dataset with article_ids
     def test_all_article_ids(self):
         t = transactions.TransactionsByCustomer(self.dataset.transactions)
         actual = t.all_article_ids(self.customer)
         actual = list(actual)
-        expected = [
-            "0110065001",
-            "0531697003",
-            "0907534001",
-            "0871517002",
-            "0877274003",
-        ]
+        expected = ["041", "06", "016", "028", "056", "073"]
         self.assertEqual(expected, actual)
 
-# TODO: Important test. Think on integration test
     def test_kmeans_consumer_2(self):
         # Note: Do not scale dummy features
-        full_dummies = articles.ArticleFeaturesSimpleFeatures(
-            self.dataset.articles, use_article_id=True
-        ).x
+        munger = articles.ArticleFeatureMungerSpecificFeatures(
+            self.dataset.articles,
+            features=[
+                "color",
+                "article",
+            ],
+            use_article_id=True,
+        )
+        full_dummies = munger.x
         t = transactions.TransactionsByCustomer(self.dataset.transactions)
         basket = t.all_article_ids(self.customer)
         customer_dummies = full_dummies.merge(

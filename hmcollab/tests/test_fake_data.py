@@ -52,10 +52,19 @@ class TestFakeData(unittest.TestCase):
         self.assertEqual("2022-04-21", dates[-1])
 
     def test_transactions_random_df(self):
-        customer_df = fake_data.fake_customers(10)
-        articles_df = fake_data.articles_random_df(10)
-        n = 50
+        customer_df = fake_data.fake_customers(100)
+        articles_df = fake_data.articles_random_df(100)
+        n = 1000
         df = fake_data.transactions_random_df(customer_df, articles_df, n)
+
+        expected = customer_df.customer_id.unique()
+        actual = df.customer_id.unique()
+        self.assertEqual(set(expected), set(actual))
+
+        expected = articles_df.article_id.unique()
+        actual = df.article_id.unique()
+        self.assertEqual(set(expected), set(actual))
+
         self.assertEqual(n, df.shape[0])
         self.assertEqual(5, df.shape[1])
         self.assertEqual("t_dat", df.columns[0])
@@ -63,13 +72,13 @@ class TestFakeData(unittest.TestCase):
         self.assertEqual("article_id", df.columns[2])
         self.assertEqual("price", df.columns[3])
         self.assertEqual("sales_channel_id", df.columns[4])
-        self.assertEqual(datetime.datetime(2021, 4, 25), df.iloc[0].t_dat)
-        self.assertEqual(datetime.datetime(2022, 3, 2), df.iloc[-1].t_dat)
-        self.assertEqual("06", df.iloc[0].customer_id)
-        self.assertEqual("07", df.iloc[-1].customer_id)
-        self.assertEqual("02", df.iloc[0].article_id)
-        self.assertEqual("07", df.iloc[-1].article_id)
-        self.assertEqual(0.3114133093912942, df.iloc[0].price)
-        self.assertEqual(0.41794603171557876, df.iloc[-1].price)
-        self.assertEqual(1, df.iloc[0].sales_channel_id)
+        self.assertEqual(datetime.datetime(2021, 4, 28), df.iloc[0].t_dat)
+        self.assertEqual(datetime.datetime(2022, 4, 2), df.iloc[-1].t_dat)
+        self.assertEqual("021", df.iloc[0].customer_id)
+        self.assertEqual("010", df.iloc[-1].customer_id)
+        self.assertEqual("051", df.iloc[0].article_id)
+        self.assertEqual("085", df.iloc[-1].article_id)
+        self.assertEqual(0.3188173228730047, df.iloc[0].price)
+        self.assertEqual(0.210528488440613, df.iloc[-1].price)
+        self.assertEqual(2, df.iloc[0].sales_channel_id)
         self.assertEqual(1, df.iloc[-1].sales_channel_id)
