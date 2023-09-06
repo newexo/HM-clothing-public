@@ -10,13 +10,13 @@ from hmcollab.tests.fake_data import articles_random_df
 
 class TestSimilarity(unittest.TestCase):
     def setUp(self):
-        self.articles = articles_random_df()
+        self.articles = articles_random_df(n=20)
         self.color_similarity = ArticleSimilarityByColumn(self.articles, "color")
         self.articles_similarity = ArticleSimilarityByColumn(self.articles, "article")
         self.id0 = "00"
         self.id1 = "01"
-        self.id2 = "05"
-        self.id3 = "05"
+        self.id2 = "016"
+        self.id3 = "016"
         self.ids = [self.id0, self.id1, self.id2, self.id3]
 
     def tearDown(self):
