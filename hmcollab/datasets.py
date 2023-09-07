@@ -6,26 +6,6 @@ from .directory_tree import HMDatasetDirectoryTree
 from .three_part_dataset import ThreePartDataset
 
 
-class TargetSlow:
-    def __init__(self, transactions_df):
-        def create_relevant_set(df, customer_list):
-            # df is a transactions DataFrame
-            relevant = pd.DataFrame(columns=["target"], index=customer_list)
-            for c in customer_list:
-                relevant.loc[c] = {
-                    "target": " ".join(df.loc[df.customer_id == c, "article_id"])
-                }
-            relevant = relevant.reset_index().rename(columns={"index": "customer_id"})
-            return relevant
-
-        self.transactions = transactions_df
-        self.transactions_x, self.transactions_y = hmcollab.splitter.split_by_time(
-            self.transactions, days=7
-        )
-        target_ids = self.transactions_y.customer_id.unique()
-        self.relevant_set = create_relevant_set(self.transactions_y, target_ids)
-
-
 class Target:
     def __init__(self, transactions_df):
         def relevant_dict(tup):
