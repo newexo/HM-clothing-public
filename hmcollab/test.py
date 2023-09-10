@@ -9,6 +9,7 @@ from hmcollab.tests.test_example import TestExample
 from hmcollab.tests.test_fake_data import TestFakeData
 from hmcollab.tests.test_scoring import TestScoring
 from hmcollab.tests.test_transactions import TestTransactions
+from hmcollab.tests.test_relevant import TestRelevant
 
 # integration tests
 from hmcollab.tests.integration_tests.integration_test_data_exists import IntegrationTestDataExists
@@ -35,6 +36,7 @@ def suite(integration):
     s.add(TestFakeData)
     s.add(TestScoring)
     s.add(TestTransactions)
+    s.add(TestRelevant)
 
     if integration:
         print("Running integration tests.")
