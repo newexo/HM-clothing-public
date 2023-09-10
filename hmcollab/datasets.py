@@ -7,13 +7,13 @@ from .three_part_dataset import ThreePartDataset
 
 
 class Target:
-    def __init__(self, transactions_df):
+    def __init__(self, transactions_df, days=7):
         def relevant_dict(tup):
             return " ".join(tup[1].loc[:, "article_id"].tolist())
 
         self.transactions = transactions_df
         self.transactions_x, self.transactions_y = hmcollab.splitter.split_by_time(
-            self.transactions, days=7
+            self.transactions, days=days
         )
         grouped = self.transactions_y.loc[:, ["customer_id", "article_id"]].groupby(
             ["customer_id"]
@@ -26,8 +26,7 @@ class Target:
         self.relevant_set.rename(columns={"index": "customer_id"}, inplace=True)
 
 
-# TODO: write unit test with random dataframes
-# TODO: consider writing an integration test
+# TODO: do we need both class Target and target_to_relevant()?
 def target_to_relevant(trans_y):
     """Convert to dataframe of customers with a list of transactions from the input set"""
 
@@ -46,6 +45,7 @@ def target_to_relevant(trans_y):
 class HMDataset(ThreePartDataset):
     def __init__(
         self,
+        threepartdataset=None,
         tree=None,
         articles=None,
         customers=None,
@@ -55,6 +55,12 @@ class HMDataset(ThreePartDataset):
         folds="twosets",
         prune=False,
     ):
+        if threepartdataset is not None:
+            articles = threepartdataset.articles
+            customers = threepartdataset.customers
+            transactions = threepartdataset.transactions
+            relevant_set = None
+
         if articles is None:
             if tree is None:
                 tree = HMDatasetDirectoryTree()
@@ -115,3 +121,81 @@ class HMDataset(ThreePartDataset):
             self.train_x, self.train_vy = hmcollab.splitter.split_by_time(
                 self.transactions_x, days=7
             )
+
+
+class HMDatasetTwoSets(HMDataset):
+    def __init__(
+        self,
+        threepartdataset=None,
+        tree=None,
+        articles=None,
+        customers=None,
+        transactions=None,
+        relevant_set=None,
+        toy=False,
+        prune=False,
+    ):
+        HMDataset.__init__(
+            self,
+            threepartdataset=threepartdataset,
+            tree=tree,
+            articles=articles,
+            customers=customers,
+            transactions=transactions,
+            relevant_set=relevant_set,
+            toy=toy,
+            folds="twosets",
+            prune=prune,
+        )
+
+
+class HMDatasetThreeSets(HMDataset):
+    def __init__(
+        self,
+        threepartdataset=None,
+        tree=None,
+        articles=None,
+        customers=None,
+        transactions=None,
+        relevant_set=None,
+        toy=False,
+        prune=False,
+    ):
+        HMDataset.__init__(
+            self,
+            threepartdataset=threepartdataset,
+            tree=tree,
+            articles=articles,
+            customers=customers,
+            transactions=transactions,
+            relevant_set=relevant_set,
+            toy=toy,
+            folds="threesets",
+            prune=prune,
+        )
+
+
+class HMDatasetStandard(HMDataset):
+    def __init__(
+        self,
+        threepartdataset=None,
+        tree=None,
+        articles=None,
+        customers=None,
+        transactions=None,
+        relevant_set=None,
+        toy=False,
+        prune=False,
+    ):
+        HMDataset.__init__(
+            self,
+            threepartdataset=threepartdataset,
+            tree=tree,
+            articles=articles,
+            customers=customers,
+            transactions=transactions,
+            relevant_set=relevant_set,
+            toy=toy,
+            folds="standard",
+            prune=prune,
+        )

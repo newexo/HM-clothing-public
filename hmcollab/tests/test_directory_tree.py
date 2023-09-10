@@ -4,7 +4,7 @@ from hmcollab import directories
 from hmcollab.directory_tree import HMDatasetDirectoryTree
 
 
-class TestDatasets(unittest.TestCase):
+class TestDirectoryTree(unittest.TestCase):
     def setUp(self):
         pass
 
