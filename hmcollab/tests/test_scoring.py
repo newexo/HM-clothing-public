@@ -44,6 +44,9 @@ class TestScoring(unittest.TestCase):
         actual = ap_at_k(self.ranked_results)
         self.assertEqual(expected, actual)
 
+    def test_ap_at_k_empty(self):
+        self.assertEqual(0, ap_at_k([]))
+
     def test_map_at_k(self):
         expected = (1 + 0 + ap_at_k(self.ranked_results)) / 3
         actual = map_at_k(
