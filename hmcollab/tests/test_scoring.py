@@ -1,6 +1,8 @@
 import unittest
 
-from hmcollab.scoring import precision_at_k, ap_at_k, map_at_k
+import pandas as pd
+
+from hmcollab.scoring import precision_at_k, ap_at_k, map_at_k, relevant
 
 
 class TestScoring(unittest.TestCase):
@@ -115,4 +117,27 @@ class TestScoring(unittest.TestCase):
 
         expected = (a0 + a1 + a2) / 3
         actual = map_at_k(results)
+        self.assertEqual(expected, actual)
+
+    def test_relevant(self):
+        customer_id = "0 1 2".split(" ")
+        target_col = ["a b c d", "a b c", "a b"]
+        prediction_col = ["a b c d", "c b e a", "e f g h"]
+
+        target = pd.DataFrame({"customer_id": customer_id, "target": target_col})
+        prediction = pd.DataFrame(
+            {"customer_id": customer_id, "prediction": prediction_col}
+        )
+        r = relevant(prediction, target)
+
+        expected = [True, True, True, True]
+        actual = list(r[0])
+        self.assertEqual(expected, actual)
+
+        expected = [True, True, False, True]
+        actual = list(r[1])
+        self.assertEqual(expected, actual)
+
+        expected = [False, False, False, False]
+        actual = list(r[2])
         self.assertEqual(expected, actual)
