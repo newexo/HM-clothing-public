@@ -6,27 +6,6 @@ from .directory_tree import HMDatasetDirectoryTree
 from .three_part_dataset import ThreePartDataset
 
 
-class Target:
-    def __init__(self, transactions_df, days=7):
-        def relevant_dict(tup):
-            return " ".join(tup[1].loc[:, "article_id"].tolist())
-
-        self.transactions = transactions_df
-        self.transactions_x, self.transactions_y = hmcollab.splitter.split_by_time(
-            self.transactions, days=days
-        )
-        grouped = self.transactions_y.loc[:, ["customer_id", "article_id"]].groupby(
-            ["customer_id"]
-        )
-        by_row = {t[0]: relevant_dict(t) for t in grouped}
-        self.relevant_set = pd.DataFrame.from_dict(
-            by_row, orient="index", columns=["target"]
-        )
-        self.relevant_set.reset_index(inplace=True)
-        self.relevant_set.rename(columns={"index": "customer_id"}, inplace=True)
-
-
-# TODO: do we need both class Target and target_to_relevant()?
 def target_to_relevant(trans_y):
     """Convert to dataframe of customers with a list of transactions from the input set"""
 
@@ -40,6 +19,15 @@ def target_to_relevant(trans_y):
     relevant_set.rename(columns={"index": "customer_id"}, inplace=True)
 
     return relevant_set
+
+
+class Target:
+    def __init__(self, transactions_df, days=7):
+        self.transactions = transactions_df
+        self.transactions_x, self.transactions_y = hmcollab.splitter.split_by_time(
+            self.transactions, days=days
+        )
+        self.relevant_set = target_to_relevant(self.transactions_y)
 
 
 class HMDataset(ThreePartDataset):
