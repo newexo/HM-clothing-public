@@ -80,8 +80,8 @@ def main():
     toy = generate_toy(dataset)
     relevant = generate_relevant(toy.transactions, val=False)
     save_relevant_data(relevant, directories.data("toy"), val=False)
-    # relevant = generate_relevant(toy.transactions, directories.data("toy"), val=True)
-    # save_relevant_data(relevant, directories.data("toy"), val=True)
+    relevant = generate_relevant(toy.transactions, val=True)
+    save_relevant_data(relevant, directories.data("toy"), val=True)
 
 
 if __name__ == "__main__":
