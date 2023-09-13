@@ -7,9 +7,8 @@ from hmcollab import transactions
 
 
 class PopularRecommender:
-    def __init__(self, dataset, full_article_dummies, total_recommendations=12):
+    def __init__(self, dataset, total_recommendations=12):
         self.dataset = dataset
-        self.full_article_dummies = full_article_dummies
         self.total_recommendations = total_recommendations
         self.transactions = self.dataset.train_x
 

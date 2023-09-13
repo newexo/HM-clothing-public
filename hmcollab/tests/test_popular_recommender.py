@@ -36,7 +36,6 @@ class TestPopularRecommender(unittest.TestCase):
     def test_popular_recommender(self):
         recommender = models.PopularRecommender(
             self.dataset,
-            self.full_dummies,
             total_recommendations=2,
         )
 
