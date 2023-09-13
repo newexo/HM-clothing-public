@@ -3,7 +3,6 @@ import math
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 
-from hmcollab import articles
 from hmcollab import transactions
 
 
@@ -13,9 +12,6 @@ class PopularRecommender:
         self.full_article_dummies = full_article_dummies
         self.total_recommendations = total_recommendations
         self.transactions = self.dataset.train_x
-        self.simple_munger = articles.ArticleFeaturesSimpleFeatures(
-            self.dataset.articles
-        )
 
     def recommend(self):
         """Return a list of article_ids with the most transactions.
