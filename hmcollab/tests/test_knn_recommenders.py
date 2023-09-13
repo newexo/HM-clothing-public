@@ -37,8 +37,13 @@ class TestKNNRecommenders(unittest.TestCase):
             use_article_id=True,
         )
 
-    def test_foo(self):
-        self.fail("incomplete test")
+    def get_threefold_dataset(self):
+        dataset = fake_data.random_dataset(
+            n_customers=3, n_articles=10, n_transactions=1000
+        )
+
+        dataset = datasets.HMDatasetThreeSets(threepartdataset=dataset)
+        return dataset
 
     def test_filter_article(self):
         actual = models.filter_articles(self.dataset.train_x, threshold=4)
@@ -84,8 +89,9 @@ class TestKNNRecommenders(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_knn_recommender_for3_init(self):
+        dataset = self.get_threefold_dataset()
         recommender = models.KnnRecommender_for3(
-            self.dataset,
+            dataset,
             self.full_dummies,
             groups=2,
             total_recommendations=6,
@@ -93,21 +99,17 @@ class TestKNNRecommenders(unittest.TestCase):
         )
         self.assertEqual(2, recommender.groups)
         self.assertEqual(6, recommender.total_recommendations)
-        self.assertEqual(5, recommender.filtered_dummies.article_id.nunique())
+        self.assertEqual(10, recommender.filtered_dummies.article_id.nunique())
         self.assertEqual(3, recommender.recomendations_by_group)
         self.assertEqual(3, recommender.model.k)
 
-        expected = [0, 1, 2]
+        expected = [2, 0, 1]
         actual = recommender.model.nearest(np.array([0, 0, 0, 0, 0]))[1]
         actual = list(actual.reshape(-1))
         self.assertEqual(expected, actual)
 
     def test_knn_recommender_for3_init_val(self):
-        dataset = fake_data.random_dataset(
-            n_customers=3, n_articles=10, n_transactions=1000
-        )
-
-        dataset = datasets.HMDatasetThreeSets(threepartdataset=dataset)
+        dataset = self.get_threefold_dataset()
         recommender = models.KnnRecommender_for3(
             dataset,
             self.full_dummies,
@@ -128,11 +130,7 @@ class TestKNNRecommenders(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_knn_recommender_for3_init_test(self):
-        dataset = fake_data.random_dataset(
-            n_customers=3, n_articles=10, n_transactions=1000
-        )
-
-        dataset = datasets.HMDatasetThreeSets(threepartdataset=dataset)
+        dataset = self.get_threefold_dataset()
         recommender = models.KnnRecommender_for3(
             dataset,
             self.full_dummies,

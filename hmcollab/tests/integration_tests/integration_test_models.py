@@ -120,16 +120,26 @@ class IntegrationTestModels(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_knn_recommender_for3(self):
+        dataset = datasets.HMDatasetThreeSets(threepartdataset=self.dataset)
+
+        train_x_customer_ids_set = set(dataset.train_x.customer_id)
+        customers_at_y = train_x_customer_ids_set.intersection(
+            set(dataset.train_y.customer_id)
+        )
+        customers_at_y = list(customers_at_y)
+        customers_at_y.sort()
+        customer = customers_at_y[10]
+
         recommender = models.KnnRecommender_for3(
-            self.dataset,
+            dataset,
             self.full_dummies,
             groups=2,
             total_recommendations=6,
             threshold=0,
         )
-        actual = recommender.recommend(self.customer)
-        expected_indices = [478, 1038, 1309, 427, 7409, 432]
-        expected = list(recommender.filtered_dummies.iloc[expected_indices].article_id)
+        actual = recommender.recommend(customer)
+        expected_indices = [3367, 11189, 12729, 445, 651, 1681]
+        expected = list(recommender.filtered_dummies.loc[expected_indices].article_id)
         self.assertEqual(expected, actual)
 
     def test_knn_recommender_for3_val(self):
