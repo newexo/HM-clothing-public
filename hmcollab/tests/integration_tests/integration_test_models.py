@@ -41,7 +41,7 @@ class IntegrationTestModels(unittest.TestCase):
             threshold=0,
         )
         actual = recommender.recommend(self.customer)
-        expected_indices = [478, 1038, 1309, 427, 7409,  432]
+        expected_indices = [478, 1038, 1309, 427, 7409, 432]
         expected = list(recommender.filtered_dummies.iloc[expected_indices].article_id)
         self.assertEqual(expected, actual)
 
@@ -65,13 +65,17 @@ class IntegrationTestModels(unittest.TestCase):
 
         actual = df.prediction[0]
         expected_indices = [201, 349, 106, 1172]
-        expected_list = list(recommender.filtered_dummies.iloc[expected_indices].article_id)
+        expected_list = list(
+            recommender.filtered_dummies.iloc[expected_indices].article_id
+        )
         expected = " ".join(expected_list)
         self.assertEqual(expected, actual)
 
         actual = df.prediction[1]
         expected_indices = [163, 586, 722, 727]
-        expected_list = list(recommender.filtered_dummies.iloc[expected_indices].article_id)
+        expected_list = list(
+            recommender.filtered_dummies.iloc[expected_indices].article_id
+        )
         expected = " ".join(expected_list)
         self.assertEqual(expected, actual)
 
@@ -84,7 +88,20 @@ class IntegrationTestModels(unittest.TestCase):
 
         # 1. Test recommend
         actual_recommend = recommender.recommend()
-        expected_indices = [6721, 9356, 2150, 1720, 27, 6722, 9901, 13439, 5507, 2655, 489, 2148]
+        expected_indices = [
+            6721,
+            9356,
+            2150,
+            1720,
+            27,
+            6722,
+            9901,
+            13439,
+            5507,
+            2655,
+            489,
+            2148,
+        ]
         expected = list(self.dataset.articles.iloc[expected_indices].article_id)
 
         self.assertEqual(expected, actual_recommend)
@@ -112,7 +129,7 @@ class IntegrationTestModels(unittest.TestCase):
             threshold=0,
         )
         actual = recommender.recommend(self.customer)
-        expected_indices = [478, 1038, 1309, 427, 7409,  432]
+        expected_indices = [478, 1038, 1309, 427, 7409, 432]
         expected = list(recommender.filtered_dummies.iloc[expected_indices].article_id)
         self.assertEqual(expected, actual)
 
@@ -133,7 +150,7 @@ class IntegrationTestModels(unittest.TestCase):
             groups=2,
             total_recommendations=6,
             threshold=0,
-            split='val'
+            split="val",
         )
         actual = recommender.recommend(customer)
         expected_indices = [5758, 8133, 1333, 8926, 15604, 16134]
@@ -157,7 +174,7 @@ class IntegrationTestModels(unittest.TestCase):
             groups=2,
             total_recommendations=6,
             threshold=0,
-            split='test'
+            split="test",
         )
         actual = recommender.recommend(customer)
         expected_indices = [10188, 4276, 796]
