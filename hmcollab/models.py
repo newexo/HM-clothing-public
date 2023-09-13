@@ -66,9 +66,7 @@ class KnnRecommender:
         self.full_article_dummies = full_article_dummies
         self.groups = groups
         self.total_recommendations = total_recommendations
-        self.t = transactions.TransactionsByCustomer(self.dataset.train_x)
-        filtered_art_ids = filter_articles(self.dataset.train_x, threshold=threshold)
-        # I should select features here instead of full
+        self.t, filtered_art_ids = self._compute_t_and_filtered_dummies(threshold)
         self.filtered_dummies = full_article_dummies[
             full_article_dummies.article_id.isin(filtered_art_ids)
         ]
@@ -76,6 +74,11 @@ class KnnRecommender:
             self.total_recommendations / self.groups
         )
         self.model = ArticleKNN(self.filtered_dummies, k=self.recomendations_by_group)
+
+    def _compute_t_and_filtered_dummies(self, threshold):
+        t = transactions.TransactionsByCustomer(self.dataset.train_x)
+        filtered_art_ids = filter_articles(self.dataset.train_x, threshold=threshold)
+        return t, filtered_art_ids
 
     def recommend(self, customer, drop_duplicates=True):
         recomendation_ids = []
@@ -121,6 +124,7 @@ class KnnRecommender_for3(KnnRecommender):
         threshold=50,
         split="train",
     ):
+        self.split = split
         KnnRecommender.__init__(
             self,
             dataset,
@@ -129,25 +133,13 @@ class KnnRecommender_for3(KnnRecommender):
             total_recommendations,
             threshold,
         )
-        if split == "train":
-            self.t = transactions.TransactionsByCustomer(self.dataset.train_x)
-            filtered_art_ids = filter_articles(
-                self.dataset.train_x, threshold=threshold
-            )
-            print("Articles at train: ", len(filtered_art_ids))
-        if split == "val":
-            self.t = transactions.TransactionsByCustomer(self.dataset.val_x)
-            filtered_art_ids = filter_articles(self.dataset.val_x, threshold=threshold)
-            print("Articles at val: ", len(filtered_art_ids))
-        if split == "test":
-            self.t = transactions.TransactionsByCustomer(self.dataset.test_x)
-            filtered_art_ids = filter_articles(self.dataset.test_x, threshold=threshold)
-            print("Articles at test: ", len(filtered_art_ids))
-        # I should select features here instead of full
-        self.filtered_dummies = full_article_dummies[
-            full_article_dummies.article_id.isin(filtered_art_ids)
-        ]
-        self.recomendations_by_group = math.ceil(
-            self.total_recommendations / self.groups
-        )
-        self.model = ArticleKNN(self.filtered_dummies, k=self.recomendations_by_group)
+
+    def _compute_t_and_filtered_dummies(self, threshold):
+        x = {
+            "train": self.dataset.train_x,
+            "val": self.dataset.val_x,
+            "test": self.dataset.test_x,
+        }
+        t = transactions.TransactionsByCustomer(x[self.split])
+        filtered_art_ids = filter_articles(x[self.split], threshold=threshold)
+        return t, filtered_art_ids
