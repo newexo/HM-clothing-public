@@ -39,7 +39,6 @@ class HMDataset(ThreePartDataset):
         customers=None,
         transactions=None,
         relevant_set=None,
-        toy=False,
         folds="twosets",
         prune=False,
     ):
@@ -53,7 +52,7 @@ class HMDataset(ThreePartDataset):
             if tree is None:
                 tree = HMDatasetDirectoryTree()
             self.tree = tree
-            articles, customers, transactions, relevant_set = tree.load(toy=toy)
+            articles, customers, transactions, relevant_set = tree.load()
 
         ThreePartDataset.__init__(self, articles, customers, transactions, prune=prune)
 
@@ -120,7 +119,6 @@ class HMDatasetTwoSets(HMDataset):
         customers=None,
         transactions=None,
         relevant_set=None,
-        toy=False,
         prune=False,
     ):
         HMDataset.__init__(
@@ -131,7 +129,6 @@ class HMDatasetTwoSets(HMDataset):
             customers=customers,
             transactions=transactions,
             relevant_set=relevant_set,
-            toy=toy,
             folds="twosets",
             prune=prune,
         )
@@ -146,7 +143,6 @@ class HMDatasetThreeSets(HMDataset):
         customers=None,
         transactions=None,
         relevant_set=None,
-        toy=False,
         prune=False,
     ):
         HMDataset.__init__(
@@ -157,7 +153,6 @@ class HMDatasetThreeSets(HMDataset):
             customers=customers,
             transactions=transactions,
             relevant_set=relevant_set,
-            toy=toy,
             folds="threesets",
             prune=prune,
         )
@@ -172,7 +167,6 @@ class HMDatasetStandard(HMDataset):
         customers=None,
         transactions=None,
         relevant_set=None,
-        toy=False,
         prune=False,
     ):
         HMDataset.__init__(
@@ -183,7 +177,6 @@ class HMDatasetStandard(HMDataset):
             customers=customers,
             transactions=transactions,
             relevant_set=relevant_set,
-            toy=toy,
             folds="standard",
             prune=prune,
         )

@@ -46,10 +46,6 @@ class HMDatasetDirectoryTree:
     def transactions_y_by_customer_exists(self):
         return os.path.exists(self.transactions_y_by_customer)
 
-    @property
-    def toy(self):
-        return self.path("transactions_toy.csv")
-
     def image(self, number):
         number = str(number)
         filename = "{}.jpg".format(number)
@@ -73,22 +69,16 @@ class HMDatasetDirectoryTree:
     def load_transactions(self):
         return read_with_article_id(self.transactions)
 
-    def load_toy(self):
-        return read_with_article_id(self.toy)
-
     def load_relevant(self):
         return read_with_article_id(self.transactions_y_by_customer)
 
-    def load(self, toy=False):
+    def load(self):
         articles = self.load_articles()
         customers = self.load_customers()
 
         relevant_set = None
-        if toy:
-            transactions = self.load_toy()
-        else:
-            transactions = self.load_transactions()
-            if self.transactions_y_by_customer_exists:
-                relevant_set = self.load_relevant()
+        transactions = self.load_transactions()
+        if self.transactions_y_by_customer_exists:
+            relevant_set = self.load_relevant()
 
         return articles, customers, transactions, relevant_set
