@@ -74,7 +74,7 @@ def generate_test_data(dataset):
 
 def main():
     tree = datasets.HMDatasetDirectoryTree()
-    dataset = datasets.HMDataset(tree=tree, folds="threesets", toy=False)
+    dataset = datasets.HMDataset(tree=tree, folds="threesets")
 
     generate_test_data(dataset)
     toy = generate_toy(dataset)
