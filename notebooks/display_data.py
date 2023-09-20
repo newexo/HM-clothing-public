@@ -1,9 +1,13 @@
 from IPython.display import Image, display
 import os
 
+from hmcollab.directory_tree import HMDatasetDirectoryTree
+
+tree = HMDatasetDirectoryTree()
+
 
 def display_article(dataset, article_id, width=300):
-    filename = dataset.tree.image(article_id)
+    filename = tree.image(article_id)
     if os.path.exists(filename):
         display(Image(filename, width=width))
     else:
