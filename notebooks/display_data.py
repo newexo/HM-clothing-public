@@ -5,7 +5,6 @@ from hmcollab.directory_tree import HMDatasetDirectoryTree
 
 tree = HMDatasetDirectoryTree()
 
-
 def display_article(dataset, article_id, width=300):
     filename = tree.image(article_id)
     if os.path.exists(filename):
