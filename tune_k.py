@@ -4,6 +4,7 @@ from hmcollab import models
 from hmcollab import scoring
 from hmcollab import similarity
 from hmcollab import directories
+from hmcollab import directory_tree
 
 
 import yaml
@@ -12,7 +13,7 @@ from datetime import datetime
 
 
 class StandardSetup:
-    def __init__(self, dataset, features, similarity, use_toy=True):
+    def __init__(self, dataset, features, similarity, threshold=50):
         self.data = dataset
         self.dummies = features.x
         # Only keep customers at train_x and train_y
@@ -23,11 +24,9 @@ class StandardSetup:
         self.customers_at_vy = train_x_customer_ids_set.intersection(
             set(self.data.train_vy.customer_id)
         )  # toy=607
-        self.threshold = 300
-        if use_toy:
-            self.threshold = 50
+        self.threshold = threshold
         # TODO: Is this right?
-        self.rel_vy = datasets.target_to_relevant(toy.train_vy)
+        self.rel_vy = datasets.target_to_relevant(self.data.train_vy)
         self.similarity = similarity
 
     def try_multiple_k(self, k_list):
@@ -55,7 +54,7 @@ class StandardSetup:
         }
 
 class ThreeSetsSetup:
-    def __init__(self, dataset, features, similarity, use_toy=True, threshold=10):
+    def __init__(self, dataset, features, similarity, threshold=10):
         # TODO: We never use use_toy
         self.data = dataset
         self.dummies = features.x
@@ -78,9 +77,9 @@ class ThreeSetsSetup:
         # self.threshold = 300
         # if use_toy:
         #     self.threshold = 10
-        self.rel_y = datasets.target_to_relevant(toy.train_y)   # toy=316
-        self.rel_vy = datasets.target_to_relevant(toy.val_y)    # toy=107
-        self.rel_ty = datasets.target_to_relevant(toy.test_y)   # toy=127
+        self.rel_y = datasets.target_to_relevant(self.data.train_y)   # toy=316
+        self.rel_vy = datasets.target_to_relevant(self.data.val_y)    # toy=107
+        self.rel_ty = datasets.target_to_relevant(self.data.test_y)   # toy=127
         self.similarity = similarity
 
     def try_multiple_k(self, k_list):
@@ -142,27 +141,39 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         yaml_path = sys.argv[1]
     else:
-        # yaml_path = directories.experiments("knn_exp1.yml")
-        yaml_path = directories.experiments("knn_exp4.yml")
+        # yaml_path = directories.experiments("knn_exp1.yml")  # not working well
+        # yaml_path = directories.experiments("knn_exp4.yml")
+        yaml_path = directories.experiments("knn_exp5.yml")
 
     with open(yaml_path, "r") as file:
         config = yaml.safe_load(file)
 
-    toy = datasets.HMDataset(toy=config["toy"], folds=config["split_strategy"])
-    sim = similarity.get_similarity(config.get("similarity", None), toy.articles)
+    tree = directory_tree.HMDatasetDirectoryTree(base=directories.data_toy())
+    # dataset = datasets.HMDatasetStandard(tree=tree)
+    # toy = datasets.HMDataset(toy=config["toy"], folds=config["split_strategy"])
+    
 
     i = 0
 
     for exp in config["experiments"]:
         begin = datetime.now()
         i += 1
-        the_features = articles.ArticleFeatureMungerSpecificFeatures(
-            toy.articles, features=exp["features"], use_article_id=True
-        )
         if config["split_strategy"] == 'threesets':
-            toy_k = ThreeSetsSetup(toy, similarity=sim, features=the_features, threshold=config["threshold"])
+            dataset = datasets.HMDatasetThreeSets(tree=tree)
+            print('Toy customers length:', dataset.customers.shape)
+            sim = similarity.get_similarity(config.get("similarity", None), dataset.articles)
+            the_features = articles.ArticleFeatureMungerSpecificFeatures(
+            dataset.articles, features=exp["features"], use_article_id=True
+        )
+            toy_k = ThreeSetsSetup(dataset, similarity=sim, features=the_features, threshold=config["threshold"])
         else:   
-            toy_k = StandardSetup(toy, similarity=sim, features=the_features)
+            dataset = datasets.HMDatasetStandard(tree=tree)
+            print('Toy customers length:', dataset.customers.shape)
+            sim = similarity.get_similarity(config.get("similarity", None), dataset.articles)
+            the_features = articles.ArticleFeatureMungerSpecificFeatures(
+            dataset.articles, features=exp["features"], use_article_id=True
+        )
+            toy_k = StandardSetup(dataset, similarity=sim, features=the_features, threshold=config["threshold"])
         results = toy_k.try_multiple_k(config["k"])
 
         minutes = (datetime.now()-begin).total_seconds()/60

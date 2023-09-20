@@ -19,12 +19,12 @@ experiments:
             "section_no",
             "garment_group_no",
             ]}
-    - {features: [
-            "product_type_no",
-            "product_group_name",
-            "department_no",
-            "section_no",
-            ]}
+    # - {features: [
+    #         "product_type_no",
+    #         "product_group_name",
+    #         "department_no",
+    #         "section_no",
+    #         ]}
 
 
 # ==== RESULTS ======

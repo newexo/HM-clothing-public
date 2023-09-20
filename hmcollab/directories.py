@@ -24,6 +24,8 @@ def tests(filename=None):
 def data(filename=None):
     return qualifyname(os.path.join(base(), "data"), filename)
 
+def data_toy(filename=None):
+    return qualifyname(os.path.join(data(), "toy"), filename)
 
 def testdata(filename=None):
     return qualifyname(os.path.join(tests(), "testdata"), filename)
