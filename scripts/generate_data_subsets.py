@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import os
 
 from hmcollab import directories
 from hmcollab import datasets
@@ -57,13 +58,20 @@ def generate_relevant(transactions_df, days=7, val=False):
     return datasets.target_to_relevant(transactions_y)
     
 
-def generate_toy(dataset):
+def generate_toy(dataset, dir_name="toy", size=10000):
     """
-    Creating the toy dataset (also train and test)
-    Generate toy with 10k random customer
+    Creating a toy dataset (also train and test)
+    with a specific size (default=10k) of random customer
+    The dataset will be save under the data/dir_name directory
     """
-    pruned_dataset = customer_split(dataset, 10000)
-    save_main_data(pruned_dataset, directories.data("toy"))
+    pruned_dataset = customer_split(dataset, size)
+
+    # save it under data/dir_name directory
+    print("dir_name:", dir_name)
+    print("path:", directories.data(dir_name))
+    if not os.path.exists(directories.data(dir_name)):
+        os.mkdir(directories.data(dir_name))
+    save_main_data(pruned_dataset, directories.data(dir_name))
     return pruned_dataset
 
 
@@ -75,13 +83,14 @@ def generate_test_data(dataset):
 def main():
     tree = datasets.HMDatasetDirectoryTree()
     dataset = datasets.HMDataset(tree=tree, folds="threesets")
+    directory_toy = "toy"
 
     generate_test_data(dataset)
-    toy = generate_toy(dataset)
+    toy = generate_toy(dataset, dir_name=directory_toy)
     relevant = generate_relevant(toy.transactions, val=False)
-    save_relevant_data(relevant, directories.data("toy"), val=False)
+    save_relevant_data(relevant, directories.data(directory_toy), val=False)
     relevant = generate_relevant(toy.transactions, val=True)
-    save_relevant_data(relevant, directories.data("toy"), val=True)
+    save_relevant_data(relevant, directories.data(directory_toy), val=True)
 
 
 if __name__ == "__main__":

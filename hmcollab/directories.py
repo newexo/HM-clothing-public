@@ -27,6 +27,12 @@ def data(filename=None):
 def data_toy(filename=None):
     return qualifyname(os.path.join(data(), "toy"), filename)
 
+def data_toy_orig(filename=None):
+    return qualifyname(os.path.join(data(), "toy_orig"), filename)
+
+def data_toy1k(filename=None):
+    return qualifyname(os.path.join(data(), "toy1k"), filename)
+
 def testdata(filename=None):
     return qualifyname(os.path.join(tests(), "testdata"), filename)
 

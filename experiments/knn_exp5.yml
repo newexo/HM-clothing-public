@@ -25,4 +25,5 @@ Results_experiment_1:
   - 0.05578071058688148
   map_at_k_validation:
   - 0.05176632816819732
-  minutes: 4.51904895
+  minutes: 3.9785071000000003   # before: 4.51904895   
+

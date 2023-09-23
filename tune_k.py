@@ -77,9 +77,9 @@ class ThreeSetsSetup:
         # self.threshold = 300
         # if use_toy:
         #     self.threshold = 10
-        self.rel_y = datasets.target_to_relevant(self.data.train_y)   # toy=316
-        self.rel_vy = datasets.target_to_relevant(self.data.val_y)    # toy=107
-        self.rel_ty = datasets.target_to_relevant(self.data.test_y)   # toy=127
+        self.rel_y = datasets.target_to_relevant(self.data.train_y)   # toy=316, new_toy=5512
+        self.rel_vy = datasets.target_to_relevant(self.data.val_y)    # toy=107, new_toy=1838
+        self.rel_ty = datasets.target_to_relevant(self.data.test_y)   # toy=127, new_toy=5512
         self.similarity = similarity
 
     def try_multiple_k(self, k_list):
@@ -141,14 +141,15 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         yaml_path = sys.argv[1]
     else:
-        # yaml_path = directories.experiments("knn_exp1.yml")  # not working well
+        yaml_path = directories.experiments("knn_exp1.yml")  # not working well
         # yaml_path = directories.experiments("knn_exp4.yml")
-        yaml_path = directories.experiments("knn_exp5.yml")
+        # yaml_path = directories.experiments("knn_exp5.yml")
 
     with open(yaml_path, "r") as file:
         config = yaml.safe_load(file)
 
-    tree = directory_tree.HMDatasetDirectoryTree(base=directories.data_toy())
+    # tree = directory_tree.HMDatasetDirectoryTree(base=directories.data_toy1k())
+    tree = directory_tree.HMDatasetDirectoryTree(base=directories.data_toy_orig())
     # dataset = datasets.HMDatasetStandard(tree=tree)
     # toy = datasets.HMDataset(toy=config["toy"], folds=config["split_strategy"])
     
