@@ -141,15 +141,16 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         yaml_path = sys.argv[1]
     else:
-        yaml_path = directories.experiments("knn_exp1.yml")  # not working well
+        # yaml_path = directories.experiments("knn_exp1.yml")  # not working well
         # yaml_path = directories.experiments("knn_exp4.yml")
-        # yaml_path = directories.experiments("knn_exp5.yml")
+        yaml_path = directories.experiments("knn_exp5.yml")
 
     with open(yaml_path, "r") as file:
         config = yaml.safe_load(file)
 
-    # tree = directory_tree.HMDatasetDirectoryTree(base=directories.data_toy1k())
-    tree = directory_tree.HMDatasetDirectoryTree(base=directories.data_toy_orig())
+    tree = directory_tree.HMDatasetDirectoryTree(base=directories.data_toy1k())
+    # tree = directory_tree.HMDatasetDirectoryTree(base=directories.data_toy_orig())
+    # tree = directory_tree.HMDatasetDirectoryTree(base=directories.data_toy500())
     # dataset = datasets.HMDatasetStandard(tree=tree)
     # toy = datasets.HMDataset(toy=config["toy"], folds=config["split_strategy"])
     

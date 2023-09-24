@@ -85,7 +85,7 @@ def main():
     dataset = datasets.HMDataset(tree=tree, folds="threesets")
     directory_toy = "toy"
 
-    generate_test_data(dataset)
+    # generate_test_data(dataset)
     toy = generate_toy(dataset, dir_name=directory_toy)
     relevant = generate_relevant(toy.transactions, val=False)
     save_relevant_data(relevant, directories.data(directory_toy), val=False)

@@ -33,6 +33,9 @@ def data_toy_orig(filename=None):
 def data_toy1k(filename=None):
     return qualifyname(os.path.join(data(), "toy1k"), filename)
 
+def data_toy500(filename=None):
+    return qualifyname(os.path.join(data(), "toy500"), filename)
+
 def testdata(filename=None):
     return qualifyname(os.path.join(tests(), "testdata"), filename)
 
