@@ -12,6 +12,8 @@ class IntegrationTestDataExists(IntegrationTestCase):
             base=directories.testdata("fivehundred")
         )
         self.toy_tree = HMDatasetDirectoryTree(base=directories.data("toy"))
+        self.toy1k_tree = HMDatasetDirectoryTree(base=directories.data("toy_1k"))
+        self.toy500_tree = HMDatasetDirectoryTree(base=directories.data("toy500"))
 
     def tearDown(self):
         pass
@@ -30,6 +32,16 @@ class IntegrationTestDataExists(IntegrationTestCase):
         self.assertTrue(os.path.exists(self.toy_tree.articles))
         self.assertTrue(os.path.exists(self.toy_tree.customers))
         self.assertTrue(os.path.exists(self.toy_tree.transactions))
+
+    def test_toy1k_data_exists(self):
+        self.assertTrue(os.path.exists(self.toy1k_tree.articles))
+        self.assertTrue(os.path.exists(self.toy1k_tree.customers))
+        self.assertTrue(os.path.exists(self.toy1k_tree.transactions))
+
+    def test_toy500_data_exists(self):
+        self.assertTrue(os.path.exists(self.toy500_tree.articles))
+        self.assertTrue(os.path.exists(self.toy500_tree.customers))
+        self.assertTrue(os.path.exists(self.toy500_tree.transactions))
 
     def test_test_data_contents(self):
         # Verify that shapes and a single row for test data customers, articles and transactions are as expected
