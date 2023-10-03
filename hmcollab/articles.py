@@ -31,6 +31,15 @@ class ArticleFeatureMunger(ArticleMunger, metaclass=ABCMeta):
         return pd.get_dummies(self.df[features], columns=features, prefix=features)
 
 
+class ArticleFeatureMungerSpecificFeatures(ArticleFeatureMunger):
+    def __init__(self, df: pd.DataFrame, features: list, use_article_id=False):
+        self.__features = features
+        super().__init__(df, use_article_id)
+
+    def features(self):
+        return self.__features
+
+
 class ArticleFeaturesSimpleFeatures(ArticleFeatureMunger):
     def features(self):
         return [
@@ -46,7 +55,3 @@ class ArticleFeaturesSimpleFeatures(ArticleFeatureMunger):
             "section_no",
             "garment_group_no",
         ]
-
-
-
-
