@@ -1,10 +1,11 @@
-description : "use knn recommender on toy dataset using the standard split strategy"
+description : "knn, standard strategy, threshold=50"
 
 #k: [2, 4, 5, 6, 8]
 k: [2]
-toy : True
+toy : "toy_orig"
 threshold: 50
 split_strategy: "standard"
+similarity: "product_code"
 experiments:
     # - {features: [
     #         "product_type_no",

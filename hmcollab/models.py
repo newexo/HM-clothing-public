@@ -1,5 +1,5 @@
 import math
-
+import unittest
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 
@@ -31,6 +31,8 @@ class ArticleKNN:
         self.k = k
         if "article_id" in dummies.columns:
             dummies = dummies.drop(columns=["article_id"])
+        if k < dummies.shape[0]:
+            print("At ArtlicleKNN: k < n")
         self.model = NearestNeighbors(n_neighbors=k).fit(dummies.values)
 
     def nearest(self, row=None):
@@ -39,7 +41,7 @@ class ArticleKNN:
         return self.model.kneighbors(row)
 
 
-def filter_articles(trans_df, threshold=50):
+def filter_articles(trans_df, threshold=50, warning=True):
     # Compute the number of transactions by article_id. A good threshold for toy is 50, and 300 for full dataset
     # returns:
     #    filtered_article_id: list
@@ -50,6 +52,10 @@ def filter_articles(trans_df, threshold=50):
     filtered_article_id = freqs_df.loc[
         freqs_df.transactions > threshold, "article_id"
     ].to_list()
+    if warning:
+        assert (
+            len(filtered_article_id) >= 100
+        ), "WARNING: Less than 100 articles. Try reducing the threshold"
     return filtered_article_id
 
 
@@ -61,12 +67,15 @@ class KnnRecommender:
         groups=6,
         total_recommendations=12,
         threshold=50,
+        warning=True,
     ):
         self.dataset = dataset
         self.full_article_dummies = full_article_dummies
         self.groups = groups
         self.total_recommendations = total_recommendations
-        self.t, filtered_art_ids = self._compute_t_and_filtered_dummies(threshold)
+        self.t, filtered_art_ids = self._compute_t_and_filtered_dummies(
+            threshold, warning=warning
+        )
         self.filtered_dummies = full_article_dummies[
             full_article_dummies.article_id.isin(filtered_art_ids)
         ]
@@ -75,9 +84,11 @@ class KnnRecommender:
         )
         self.model = ArticleKNN(self.filtered_dummies, k=self.recomendations_by_group)
 
-    def _compute_t_and_filtered_dummies(self, threshold):
+    def _compute_t_and_filtered_dummies(self, threshold, warning=True):
         t = transactions.TransactionsByCustomer(self.dataset.train_x)
-        filtered_art_ids = filter_articles(self.dataset.train_x, threshold=threshold)
+        filtered_art_ids = filter_articles(
+            self.dataset.train_x, threshold=threshold, warning=warning
+        )
         return t, filtered_art_ids
 
     def recommend(self, customer, drop_duplicates=True):
@@ -123,6 +134,7 @@ class KnnRecommender_for3(KnnRecommender):
         total_recommendations=12,
         threshold=50,
         split="train",
+        warning=True,
     ):
         self.split = split
         KnnRecommender.__init__(
@@ -132,14 +144,17 @@ class KnnRecommender_for3(KnnRecommender):
             groups,
             total_recommendations,
             threshold,
+            warning,
         )
 
-    def _compute_t_and_filtered_dummies(self, threshold):
+    def _compute_t_and_filtered_dummies(self, threshold, warning=True):
         x = {
             "train": self.dataset.train_x,
             "val": self.dataset.val_x,
             "test": self.dataset.test_x,
         }
         t = transactions.TransactionsByCustomer(x[self.split])
-        filtered_art_ids = filter_articles(x[self.split], threshold=threshold)
+        filtered_art_ids = filter_articles(
+            x[self.split], threshold=threshold, warning=warning
+        )
         return t, filtered_art_ids

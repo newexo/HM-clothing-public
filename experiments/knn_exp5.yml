@@ -1,7 +1,7 @@
-description : "use knn recommender on toy dataset using the threesets split strategy"
+description : "knn,threesets strategy,threshold=30, similarity=department_no"
 
 k: [2]
-toy : True
+toy : "toy_orig"     # name for the toy dataset
 threshold: 30
 split_strategy: "threesets"
 similarity: "department_no"
