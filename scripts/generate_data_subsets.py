@@ -33,6 +33,35 @@ def save_main_data(pruned_dataset, base_path):
     pruned_dataset.transactions.to_parquet(transaction_fn, index=False)          ### CHANGED
 
 
+def save_full_dataset_as_parquet(dataset, dir_name="full"):
+    """
+    Save the full (unpruned) dataset as parquet files.
+    This creates a 'full' directory parallel to 'toy', 'toy_1k', etc.
+    """
+    path = directories.data(dir_name)
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+    # Use the same naming as toy sets
+    customers_fn    = directories.qualifyname(path, "customers.parquet")
+    articles_fn     = directories.qualifyname(path, "articles.parquet")
+    transactions_fn = directories.qualifyname(path, "transactions_train.parquet")
+
+    # Full datasets
+    dataset.customers.to_parquet(customers_fn, index=False)
+    dataset.articles.to_parquet(articles_fn, index=False)
+
+    # Combine X + Y transactions to get full training transaction set
+    full_transactions = (
+        dataset.transactions_x
+        .append(dataset.transactions_y, ignore_index=True)
+    )
+
+    full_transactions.to_parquet(transactions_fn, index=False)
+
+    print(f"Saved full dataset to: {path}")
+
+
 # ----------------------------------------------------------------------
 # Save relevant datasets as PARQUET
 # ----------------------------------------------------------------------
@@ -83,6 +112,8 @@ def generate_toy_and_relevant(dataset, directory_toy, size):
 def main():
     tree = datasets.HMDatasetDirectoryTree()
     dataset = datasets.HMDataset(tree=tree, folds="threesets")
+
+    save_full_dataset_as_parquet(dataset, "full")
 
     # generate toys and their relevant datasets
     generate_toy_and_relevant(dataset, "toy", 10000)
