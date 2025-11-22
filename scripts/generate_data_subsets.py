@@ -10,69 +10,62 @@ def customer_split(dataset, customer_count):
     r = np.random.RandomState(42)
 
     selected_customers = r.choice(
-        dataset.transactions_y.customer_id.unique(), size=customer_count, replace=False
+        dataset.transactions_y.customer_id.unique(),
+        size=customer_count,
+        replace=False
     )
 
     portion = splitter.CustomerPortion(selected_customers)
     return portion.split(dataset)
 
 
+# ----------------------------------------------------------------------
+# Save main dataframes as PARQUET instead of CSV
+# ----------------------------------------------------------------------
 def save_main_data(pruned_dataset, base_path):
-    customers_fn = directories.qualifyname(base_path, "customers.csv")
-    article_fn = directories.qualifyname(base_path, "articles.csv")
-    transaction_fn = directories.qualifyname(base_path, "transactions_train.csv")
-    pruned_dataset.customers.to_csv(customers_fn, index=False)
-    pruned_dataset.articles.to_csv(article_fn, index=False)
-    pruned_dataset.transactions.to_csv(transaction_fn, index=False)
+    # original filenames (CSV), we will convert them to .parquet
+    customers_fn = directories.qualifyname(base_path, "customers.parquet")       ### CHANGED
+    article_fn   = directories.qualifyname(base_path, "articles.parquet")        ### CHANGED
+    transaction_fn = directories.qualifyname(base_path, "transactions_train.parquet")  ### CHANGED
+
+    pruned_dataset.customers.to_parquet(customers_fn, index=False)               ### CHANGED
+    pruned_dataset.articles.to_parquet(article_fn, index=False)                  ### CHANGED
+    pruned_dataset.transactions.to_parquet(transaction_fn, index=False)          ### CHANGED
 
 
+# ----------------------------------------------------------------------
+# Save relevant datasets as PARQUET
+# ----------------------------------------------------------------------
 def save_relevant_data(relevant_data, base_path, val=False):
-    name = "relevant.csv"
-    if val:
-        name = "relevant_val.csv"
+    name = "relevant.parquet" if not val else "relevant_val.parquet"            ### CHANGED
     relevant_fn = directories.qualifyname(base_path, name)
-    relevant_data.to_csv(relevant_fn, index=False)
+    relevant_data.to_parquet(relevant_fn, index=False)                           ### CHANGED
 
 
 def generate_relevant(transactions_df, directory_toy=None, days=7, val=False):
-    """Relevant transactions are those of interest for prediction (i.e. the most
-    recent transactions). It produces a dataframe with all relevant transactions by customer
-    separated by a space. The timeframe goes back the number of days specified (from the most
-    recent transaction in the dataset). When val=True, it will use the previous timeframe as
-    the one used when val=False to use as a validation set (instead of the test set).
-
-    Args:
-        transactions_df (_type_): transactions dataframe
-        directory_toy (str, optional): Directory name. Defaults to None.
-        days (int, optional): Number of days. Defaults to 7.
-        val (bool, optional): True for test set and False for validation set. Defaults to False.
-
-    Returns:
-        _type_: dataframe by customer. Columns: "customer_id" and "target"
-    """
     transactions_x, transactions_y = splitter.split_by_time(transactions_df, days=days)
     if val:
         _, transactions_y = splitter.split_by_time(transactions_x, days=days)
+
     relevant = datasets.target_to_relevant(transactions_y)
+
     if directory_toy is not None:
         save_relevant_data(relevant, directories.data(directory_toy), val=False)
+
     return relevant
 
 
 def generate_toy(dataset, dir_name="toy", size=10000):
-    """
-    Creating a toy dataset (also train and test)
-    with a specific size (default=10k) of random customer
-    The dataset will be save under the data/dir_name directory
-    """
     pruned_dataset = customer_split(dataset, size)
 
-    # save it under data/dir_name directory
+    # ensure directory exists
+    path = directories.data(dir_name)
     print("dir_name:", dir_name)
-    print("path:", directories.data(dir_name))
-    if not os.path.exists(directories.data(dir_name)):
-        os.mkdir(directories.data(dir_name))
-    save_main_data(pruned_dataset, directories.data(dir_name))
+    print("path:", path)
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+    save_main_data(pruned_dataset, path)
     return pruned_dataset
 
 
