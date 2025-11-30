@@ -19,56 +19,61 @@ def customer_split(dataset, customer_count):
     return portion.split(dataset)
 
 
-# ----------------------------------------------------------------------
-# Save main dataframes as PARQUET instead of CSV
-# ----------------------------------------------------------------------
-def save_main_data(pruned_dataset, base_path):
-    # original filenames (CSV), we will convert them to .parquet
-    customers_fn = directories.qualifyname(base_path, "customers.parquet")       ### CHANGED
-    article_fn   = directories.qualifyname(base_path, "articles.parquet")        ### CHANGED
-    transaction_fn = directories.qualifyname(base_path, "transactions_train.parquet")  ### CHANGED
+def save_parquet_and_csv(df, parquet_path):
+    """
+    Given a dataframe and a .parquet filename,
+    write both the parquet file and a CSV file with the same basename.
+    """
+    # Write parquet
+    df.to_parquet(parquet_path, index=False)
 
-    pruned_dataset.customers.to_parquet(customers_fn, index=False)               ### CHANGED
-    pruned_dataset.articles.to_parquet(article_fn, index=False)                  ### CHANGED
-    pruned_dataset.transactions.to_parquet(transaction_fn, index=False)          ### CHANGED
+    # Construct the CSV filename next to the parquet file
+    csv_path = parquet_path.replace(".parquet", ".csv")
+    df.to_csv(csv_path, index=False)
+
+
+def save_main_data(pruned_dataset, base_path):
+    customers_fn    = directories.qualifyname(base_path, "customers.parquet")
+    article_fn      = directories.qualifyname(base_path, "articles.parquet")
+    transaction_fn  = directories.qualifyname(base_path, "transactions_train.parquet")
+
+    save_parquet_and_csv(pruned_dataset.customers, customers_fn)
+    save_parquet_and_csv(pruned_dataset.articles, article_fn)
+    save_parquet_and_csv(pruned_dataset.transactions, transaction_fn)
 
 
 def save_full_dataset_as_parquet(dataset, dir_name="full"):
     """
-    Save the full (unpruned) dataset as parquet files.
-    This creates a 'full' directory parallel to 'toy', 'toy_1k', etc.
+    Save the full (unpruned) dataset as parquet + csv files.
     """
     path = directories.data(dir_name)
     if not os.path.exists(path):
         os.mkdir(path)
 
-    # Use the same naming as toy sets
     customers_fn    = directories.qualifyname(path, "customers.parquet")
     articles_fn     = directories.qualifyname(path, "articles.parquet")
     transactions_fn = directories.qualifyname(path, "transactions_train.parquet")
 
-    # Full datasets
-    dataset.customers.to_parquet(customers_fn, index=False)
-    dataset.articles.to_parquet(articles_fn, index=False)
+    # Save dimension tables
+    save_parquet_and_csv(dataset.customers, customers_fn)
+    save_parquet_and_csv(dataset.articles, articles_fn)
 
-    # Combine X + Y transactions to get full training transaction set
+    # Combine X + Y transactions
     full_transactions = (
         dataset.transactions_x
         .append(dataset.transactions_y, ignore_index=True)
     )
 
-    full_transactions.to_parquet(transactions_fn, index=False)
+    save_parquet_and_csv(full_transactions, transactions_fn)
 
     print(f"Saved full dataset to: {path}")
 
 
-# ----------------------------------------------------------------------
-# Save relevant datasets as PARQUET
-# ----------------------------------------------------------------------
 def save_relevant_data(relevant_data, base_path, val=False):
-    name = "relevant.parquet" if not val else "relevant_val.parquet"            ### CHANGED
+    name = "relevant.parquet" if not val else "relevant_val.parquet"
     relevant_fn = directories.qualifyname(base_path, name)
-    relevant_data.to_parquet(relevant_fn, index=False)                           ### CHANGED
+
+    save_parquet_and_csv(relevant_data, relevant_fn)
 
 
 def generate_relevant(transactions_df, directory_toy=None, days=7, val=False):
@@ -87,10 +92,7 @@ def generate_relevant(transactions_df, directory_toy=None, days=7, val=False):
 def generate_toy(dataset, dir_name="toy", size=10000):
     pruned_dataset = customer_split(dataset, size)
 
-    # ensure directory exists
     path = directories.data(dir_name)
-    print("dir_name:", dir_name)
-    print("path:", path)
     if not os.path.exists(path):
         os.mkdir(path)
 
@@ -115,7 +117,6 @@ def main():
 
     save_full_dataset_as_parquet(dataset, "full")
 
-    # generate toys and their relevant datasets
     generate_toy_and_relevant(dataset, "toy", 10000)
     generate_toy_and_relevant(dataset, "toy_1k", 1000)
     generate_toy_and_relevant(dataset, "toy500", 500)
