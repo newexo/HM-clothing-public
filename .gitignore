@@ -136,6 +136,11 @@ data/*.csv
 data/*.parquet
 data/*/*.csv
 data/*/*.parquet
+data/*/*/*.csv
+data/*/*/*.parquet
+data/*/*/*/*.csv
+data/*/*/*/*.parquet
+data/full/
 data/images
 hmcollab/tests/testdata/fivehundred/*.csv
 hmcollab/tests/testdata/fivehundred/*.parquet

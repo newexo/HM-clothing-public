@@ -1,18 +1,36 @@
 import numpy as np
 import os
+from collections import OrderedDict
 
 from hmcollab import directories
 from hmcollab import datasets
 from hmcollab import splitter
 
 
+def split_transactions_by_month(transactions_df):
+    """
+    Given a DataFrame with a datetime64 column `t_dat`,
+    return an OrderedDict mapping (year, month) → monthly_dataframe.
+    """
+
+    # Extract year and month
+    df = transactions_df.copy()
+    df["year"] = df.t_dat.dt.year
+    df["month"] = df.t_dat.dt.month
+
+    # Group and collect
+    monthly = OrderedDict()
+    for (y, m), group in df.groupby(["year", "month"]):
+        monthly[(y, m)] = group.drop(columns=["year", "month"])
+
+    return monthly
+
+
 def customer_split(dataset, customer_count):
     r = np.random.RandomState(42)
 
     selected_customers = r.choice(
-        dataset.transactions_y.customer_id.unique(),
-        size=customer_count,
-        replace=False
+        dataset.transactions_y.customer_id.unique(), size=customer_count, replace=False
     )
 
     portion = splitter.CustomerPortion(selected_customers)
@@ -33,9 +51,9 @@ def save_parquet_and_csv(df, parquet_path):
 
 
 def save_main_data(pruned_dataset, base_path):
-    customers_fn    = directories.qualifyname(base_path, "customers.parquet")
-    article_fn      = directories.qualifyname(base_path, "articles.parquet")
-    transaction_fn  = directories.qualifyname(base_path, "transactions_train.parquet")
+    customers_fn = directories.qualifyname(base_path, "customers.parquet")
+    article_fn = directories.qualifyname(base_path, "articles.parquet")
+    transaction_fn = directories.qualifyname(base_path, "transactions_train.parquet")
 
     save_parquet_and_csv(pruned_dataset.customers, customers_fn)
     save_parquet_and_csv(pruned_dataset.articles, article_fn)
@@ -45,26 +63,51 @@ def save_main_data(pruned_dataset, base_path):
 def save_full_dataset_as_parquet(dataset, dir_name="full"):
     """
     Save the full (unpruned) dataset as parquet + csv files.
+    Additionally, split the transactions by year and month and
+    save each shard under full/transactions/YYYY/MM/.
     """
     path = directories.data(dir_name)
     if not os.path.exists(path):
         os.mkdir(path)
 
-    customers_fn    = directories.qualifyname(path, "customers.parquet")
-    articles_fn     = directories.qualifyname(path, "articles.parquet")
+    customers_fn = directories.qualifyname(path, "customers.parquet")
+    articles_fn = directories.qualifyname(path, "articles.parquet")
     transactions_fn = directories.qualifyname(path, "transactions_train.parquet")
 
-    # Save dimension tables
+    # Save dimension tables (full)
     save_parquet_and_csv(dataset.customers, customers_fn)
     save_parquet_and_csv(dataset.articles, articles_fn)
 
     # Combine X + Y transactions
-    full_transactions = (
-        dataset.transactions_x
-        .append(dataset.transactions_y, ignore_index=True)
+    full_transactions = dataset.transactions_x.append(
+        dataset.transactions_y, ignore_index=True
     )
 
+    # Save unified full transactions file
     save_parquet_and_csv(full_transactions, transactions_fn)
+
+    # split into monthly partitions and save those as well
+    monthly = split_transactions_by_month(full_transactions)
+
+    # Base directory for monthly shards: full/transactions/
+    tx_base = os.path.join(path, "transactions")
+    if not os.path.exists(tx_base):
+        os.mkdir(tx_base)
+
+    for (year, month), df_month in monthly.items():
+        # Directory: full/transactions/YYYY/
+        year_dir = os.path.join(tx_base, f"{year}")
+        if not os.path.exists(year_dir):
+            os.mkdir(year_dir)
+
+        # Directory: full/transactions/YYYY/MM/
+        month_dir = os.path.join(year_dir, f"{month:02d}")
+        if not os.path.exists(month_dir):
+            os.mkdir(month_dir)
+
+        # File name: YYYY-MM.parquet
+        fn = directories.qualifyname(month_dir, f"{year}-{month:02d}.parquet")
+        save_parquet_and_csv(df_month, fn)
 
     print(f"Saved full dataset to: {path}")
 

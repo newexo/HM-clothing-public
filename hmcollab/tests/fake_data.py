@@ -40,9 +40,11 @@ def dates_random(n_month=50, r=None):
         for month, month_max in months.items():
             days = r.randint(low=1, high=month_max, size=n_month)
             temp = [
-                str(year) + "-" + str(month) + "-0" + str(day)
-                if day < 10
-                else str(year) + "-" + str(month) + "-" + str(day)
+                (
+                    str(year) + "-" + str(month) + "-0" + str(day)
+                    if day < 10
+                    else str(year) + "-" + str(month) + "-" + str(day)
+                )
                 for day in days
             ]
             dates.extend(temp)

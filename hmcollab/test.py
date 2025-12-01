@@ -21,7 +21,9 @@ from hmcollab.tests.test_relevant import TestRelevant
 from hmcollab.tests.integration_tests.integration_test_data_exists import (
     IntegrationTestDataExists,
 )
-from hmcollab.tests.integration_tests.integration_test_models import IntegrationTestModels
+from hmcollab.tests.integration_tests.integration_test_models import (
+    IntegrationTestModels,
+)
 
 
 class CountSuite(object):
