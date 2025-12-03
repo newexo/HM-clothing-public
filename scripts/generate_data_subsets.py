@@ -39,13 +39,18 @@ def customer_split(dataset, customer_count):
 
 def save_parquet_and_csv(df, parquet_path):
     """
-    Given a dataframe and a .parquet filename,
-    write both the parquet file and a CSV file with the same basename.
+    Write both a parquet file (with proper logical timestamp types)
+    and a CSV file with the same basename.
     """
-    # Write parquet
-    df.to_parquet(parquet_path, index=False)
+    df.to_parquet(
+        parquet_path,
+        index=False,
+        engine="pyarrow",
+        # Explicitly request logical timestamps instead of raw int64
+        coerce_timestamps="us",
+        allow_truncated_timestamps=True
+    )
 
-    # Construct the CSV filename next to the parquet file
     csv_path = parquet_path.replace(".parquet", ".csv")
     df.to_csv(csv_path, index=False)
 
